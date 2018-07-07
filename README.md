@@ -22,7 +22,7 @@ Taking equations
 
 logs the solution
 ```
-go run hello.go ./small.json
+go run hesabu.go ./small.json
 2018/07/07 00:07:58 sum1 = 10.54 (SUM(10,.54))
 2018/07/07 00:07:58 sum2 = 10.54 (sum(10,0.54))
 2018/07/07 00:07:58 max1 = 100 (max(10,100))
