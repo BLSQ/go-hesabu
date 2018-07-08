@@ -23,7 +23,7 @@ Taking equations
 
 logs the solution
 ```
-go run hesabu.go ./small.json
+go run hesabu.go ./test/small.json
 2018/07/07 00:07:58 sum1 = 10.54 (SUM(10,.54))
 2018/07/07 00:07:58 sum2 = 10.54 (sum(10,0.54))
 2018/07/07 00:07:58 max1 = 100 (max(10,100))
@@ -64,7 +64,7 @@ go run hesabu.go s
 and post problem and get solutions
 
 ```
-time curl -H "Content-Type: application/json"  --data @small.json http://127.0.0.1:8080
+time curl -H "Content-Type: application/json"  --data @test/small.json http://127.0.0.1:8080
 {
   "a": 10,
   "avg1": 2.5,
