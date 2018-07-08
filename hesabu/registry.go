@@ -2,9 +2,31 @@ package hesabu
 
 import (
 	"github.com/Knetic/govaluate"
+	"math"
 )
 
 func Functions() map[string]govaluate.ExpressionFunction {
+	accessFunction := func(args ...interface{}) (interface{}, error) {
+		//TODO
+		return args[1], nil
+	}
+	scoreTableFunction := func(args ...interface{}) (interface{}, error) {
+		//TODO
+		return args[1], nil
+	}
+	absFunction := func(args ...interface{}) (interface{}, error) {
+		return math.Abs(args[0].(float64)), nil
+	}
+	roundFunction := func(args ...interface{}) (interface{}, error) {
+		places := 0
+		if len(args) == 2 {
+			places = int(args[1].(float64))
+		}
+		f := args[0].(float64)
+		shift := math.Pow(10, float64(places))
+		return (math.Round(f*shift) / shift), nil
+	}
+
 	ifFunction := func(args ...interface{}) (interface{}, error) {
 		var result interface{}
 		if args[0].(bool) {
@@ -59,22 +81,29 @@ func Functions() map[string]govaluate.ExpressionFunction {
 			length := len(args[0].(string))
 			return (float64)(length), nil
 		},
-		"if":       ifFunction,
-		"IF":       ifFunction,
-		"If":       ifFunction,
-		"max":      maxFunction,
-		"MAX":      maxFunction,
-		"Max":      maxFunction,
-		"min":      minFunction,
-		"MIN":      minFunction,
-		"Min":      minFunction,
-		"safe_div": safeDivFuntion,
-		"sum":      sumFunction,
-		"SUM":      sumFunction,
-		"Sum":      sumFunction,
-		"avg":      averageFunction,
-		"AVG":      averageFunction,
-		"ABS":      averageFunction,
+		"if":          ifFunction,
+		"IF":          ifFunction,
+		"If":          ifFunction,
+		"max":         maxFunction,
+		"MAX":         maxFunction,
+		"Max":         maxFunction,
+		"min":         minFunction,
+		"MIN":         minFunction,
+		"Min":         minFunction,
+		"safe_div":    safeDivFuntion,
+		"sum":         sumFunction,
+		"SUM":         sumFunction,
+		"Sum":         sumFunction,
+		"avg":         averageFunction,
+		"AVG":         averageFunction,
+		"ABS":         absFunction,
+		"abs":         absFunction,
+		"access":      accessFunction,
+		"score_table": scoreTableFunction,
+		"score_Table": scoreTableFunction,
+		"SCORE_TABLE": scoreTableFunction,
+		"round":       roundFunction,
+		"ROUND":       roundFunction,
 	}
 	return functions
 }
