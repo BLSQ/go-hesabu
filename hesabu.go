@@ -11,14 +11,17 @@ import (
 )
 
 func init() {
-	log.SetOutput(ioutil.Discard)
+	if os.Getenv("HESABU_DEBUG") == "true" {
+		log.SetOutput(os.Stderr)
+	} else {
+		log.SetOutput(ioutil.Discard)
+	}
 }
 
 func main() {
 
 	rawEquations := getEquations()
 	parsedEquations := hesabu.Parse(rawEquations, hesabu.Functions())
-	log.Printf("during parsing %v ", parsedEquations.Errors)
 	if len(parsedEquations.Errors) > 0 {
 		logErrors(parsedEquations.Errors)
 		os.Exit(1)
@@ -47,7 +50,6 @@ func main() {
 }
 
 func logErrors(errors []hesabu.EvalError) {
-	log.Printf("during parsing %v ", errors)
 	var content = make(map[string]interface{}, 1)
 	content["errors"] = errors
 	b, _ := json.MarshalIndent(content, "", "  ")

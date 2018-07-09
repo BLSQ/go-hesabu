@@ -15,12 +15,42 @@ func Functions() map[string]govaluate.ExpressionFunction {
 		return result, nil
 	}
 	accessFunction := func(args ...interface{}) (interface{}, error) {
-		//TODO
-		return args[1], nil
+		index := int(args[len(args)-1].(float64))
+		return args[index], nil
 	}
 	scoreTableFunction := func(args ...interface{}) (interface{}, error) {
-		//TODO
-		return args[1], nil
+		/* 	  SCORE_TABLE = lambda do |*args|
+		        target = args.shift
+		        matching_rules = args.each_slice(3).find do |lower, greater, result|
+		          greater.nil? || result.nil? ? true : lower <= target && target < greater
+		        end
+		        matching_rules.last
+			  end
+		*/
+		target := args[0].(float64)
+		rules := args[1:len(args)]
+		chunkSize := 3
+		for i := 0; i < len(rules); i += chunkSize {
+			end := i + chunkSize
+
+			if end > len(rules) {
+				end = len(rules)
+			}
+
+			page := rules[i:end]
+			if len(page) == 3 {
+				lower := page[0].(float64)
+				greater := page[1].(float64)
+				value := page[2].(float64)
+				if lower <= target && target < greater {
+					return value, nil
+				}
+			} else {
+				return page[0].(float64), nil
+			}
+		}
+
+		return args[0], nil
 	}
 	absFunction := func(args ...interface{}) (interface{}, error) {
 		return math.Abs(args[0].(float64)), nil

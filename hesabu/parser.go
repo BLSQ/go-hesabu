@@ -3,6 +3,7 @@ package hesabu
 import (
 	"fmt"
 	"log"
+	"math"
 
 	"github.com/Knetic/govaluate"
 	toposort "github.com/otaviokr/topological-sort"
@@ -16,6 +17,7 @@ type ParsedEquations struct {
 	Errors       []EvalError
 }
 
+// returned as err
 type CustomError struct {
 	EvalError EvalError
 }
@@ -59,14 +61,16 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 	topsort := toposort.ReversedSort(parsedEquations.Dependencies)
 
 	solutions := make(map[string]interface{}, len(parsedEquations.RawEquations))
-	log.Println("topsort %v", topsort)
+	if len(topsort) == 0 {
+		evalError := EvalError{Message: "cycle between equations", Source: "general", Expression: "general"}
+		return make(map[string]interface{}), &CustomError{EvalError: evalError}
+	}
+
 	for _, key := range topsort {
+
 		result, err := parsedEquations.Equations[key].Evaluate(solutions)
 		if err != nil {
-			equation := parsedEquations.RawEquations[key]
-			evalError := EvalError{Message: "evaluate error " + err.Error(), Source: key, Expression: equation}
-			log.Printf("%s => %v (%s)", key, err.Error(), parsedEquations.RawEquations[key])
-			return make(map[string]interface{}), &CustomError{EvalError: evalError}
+			return parsedEquations.newSingleError(key, err.Error())
 		}
 
 		v, ok := result.(float64)
@@ -74,7 +78,11 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 			log.Printf("%v is not float64, %v (%s)", result, key, parsedEquations.RawEquations[key])
 		} else {
 			log.Printf("%s = %v (%s)", key, v, parsedEquations.RawEquations[key])
-			solutions[key] = v
+			if math.IsInf(v, 0) {
+				return parsedEquations.newSingleError(key, "Divide by zero")
+			} else {
+				solutions[key] = v
+			}
 		}
 
 		vBool, okBool := result.(bool)
@@ -85,7 +93,12 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 		if okString {
 			solutions[key] = vString
 		}
-
 	}
 	return solutions, nil
+}
+
+func (parsedEquations ParsedEquations) newSingleError(key string, message string) (map[string]interface{}, error) {
+	equation := parsedEquations.RawEquations[key]
+	evalError := EvalError{Message: message, Source: key, Expression: equation}
+	return make(map[string]interface{}), &CustomError{EvalError: evalError}
 }
