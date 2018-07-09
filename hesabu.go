@@ -1,14 +1,15 @@
 package main
 
 import (
-	"./hesabu"
 	"encoding/json"
 	"fmt"
-	"github.com/NYTimes/gziphandler"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+
+	"./hesabu"
+	"github.com/NYTimes/gziphandler"
 )
 
 func init() {
@@ -30,7 +31,7 @@ func handler(w http.ResponseWriter, request *http.Request) {
 		rawEquations[k] = fmt.Sprintf("%v", v)
 	}
 	parsedEquations := hesabu.Parse(rawEquations, hesabu.Functions())
-
+	log.Printf("equations errors? %d ", len(parsedEquations.Errors))
 	solutions := parsedEquations.Solve()
 	b, _ := json.MarshalIndent(solutions, "", "  ")
 	s := string(b)
@@ -47,14 +48,27 @@ func main() {
 	} else {
 		rawEquations := getEquations(os.Args[1])
 		parsedEquations := hesabu.Parse(rawEquations, hesabu.Functions())
-		solutions := parsedEquations.Solve()
-		logSolution(solutions)
+		log.Printf("during parsing %v ", parsedEquations.Errors)
+		if len(parsedEquations.Errors) > 0 {
+			logErrors(parsedEquations.Errors)
+		} else {
+			solutions := parsedEquations.Solve()
+			logSolution(solutions)
+		}
 	}
+}
+
+func logErrors(errors []hesabu.EvalError) {
+	log.Printf("during parsing %v ", errors)
+	var content = make(map[string]interface{}, 1)
+	content["errors"] = errors
+	b, _ := json.MarshalIndent(content, "", "  ")
+	s := string(b)
+	fmt.Println(s)
 }
 
 func logSolution(solutions map[string]interface{}) {
 	b, _ := json.MarshalIndent(solutions, "", "  ")
-	// Convert bytes to string.
 	s := string(b)
 	fmt.Println(s)
 }
@@ -63,7 +77,7 @@ func getEquations(file string) map[string]string {
 	raw, err := ioutil.ReadFile(file)
 	if err != nil {
 		fmt.Println(err.Error())
-		os.Exit(1)
+		os.Exit(-1)
 	}
 
 	var results map[string]string

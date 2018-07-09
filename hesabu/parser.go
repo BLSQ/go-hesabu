@@ -1,12 +1,11 @@
 package hesabu
 
 import (
-	"fmt"
+	"log"
+	"regexp"
+
 	"github.com/Knetic/govaluate"
 	toposort "github.com/otaviokr/topological-sort"
-	"log"
-	"os"
-	"regexp"
 )
 
 // ParsedEquations raw equation, EvaluableExpression and dependencies
@@ -14,11 +13,19 @@ type ParsedEquations struct {
 	RawEquations map[string]string
 	Equations    map[string]govaluate.EvaluableExpression
 	Dependencies map[string][]string
+	Errors       []EvalError
+}
+
+// Eval or parsing errors
+type EvalError struct {
+	Source     string `json:"source"`
+	Expression string `json:"expression"`
+	Message    string `json:"message"`
 }
 
 // Parse string equation in a EvaluableExpressions and their dependencies
 func Parse(rawEquations map[string]string, functions map[string]govaluate.ExpressionFunction) ParsedEquations {
-
+	var errors []EvalError
 	equations := make(map[string]govaluate.EvaluableExpression, len(rawEquations))
 	equationDependencies := make(map[string][]string, len(rawEquations))
 	for key, exp := range rawEquations {
@@ -32,16 +39,14 @@ func Parse(rawEquations map[string]string, functions map[string]govaluate.Expres
 		// https://github.com/Knetic/govaluate/blob/master/EvaluableExpression.go
 		expression, err := govaluate.NewEvaluableExpressionWithFunctions(fixedExpression, functions)
 		if err != nil {
-			log.Fatalf("error %#v %#v %#v", err, key, exp)
-			fmt.Printf("error")
-			os.Exit(1)
+			errors = append(errors, EvalError{Source: key, Message: err.Error(), Expression: fixedExpression})
+		} else {
+			equations[key] = *expression
+			log.Printf("vars  %v", expression.Vars())
+			equationDependencies[key] = expression.Vars()
 		}
-		equations[key] = *expression
-
-		log.Printf("vars  %v", expression.Vars())
-		equationDependencies[key] = expression.Vars()
 	}
-	return ParsedEquations{Equations: equations, Dependencies: equationDependencies, RawEquations: rawEquations}
+	return ParsedEquations{Equations: equations, Dependencies: equationDependencies, RawEquations: rawEquations, Errors: errors}
 }
 
 // Solve the equation in correct order and return map of values

@@ -1,4 +1,5 @@
 {
     "a": "10",
-    "b": "unsupported_function(15)"
+    "b": "unsupported_function(15)",
+    "c": "nonclosing(45"
 }
