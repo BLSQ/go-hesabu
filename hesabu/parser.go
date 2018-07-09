@@ -3,7 +3,6 @@ package hesabu
 import (
 	"fmt"
 	"log"
-	"regexp"
 
 	"github.com/Knetic/govaluate"
 	toposort "github.com/otaviokr/topological-sort"
@@ -42,17 +41,10 @@ func Parse(rawEquations map[string]string, functions map[string]govaluate.Expres
 	equations := make(map[string]govaluate.EvaluableExpression, len(rawEquations))
 	equationDependencies := make(map[string][]string, len(rawEquations))
 	for key, exp := range rawEquations {
-		mutiple := regexp.MustCompile(`(=)+`)
-		single := regexp.MustCompile(`=`)
-		interFixedExpression := mutiple.ReplaceAllString(exp, "=")
-		fixedExpression := single.ReplaceAllString(interFixedExpression, "==")
-		if fixedExpression != exp {
-			log.Printf("fixed \n\t%s vs \n\t%s", exp, fixedExpression)
-		}
 		// https://github.com/Knetic/govaluate/blob/master/EvaluableExpression.go
-		expression, err := govaluate.NewEvaluableExpressionWithFunctions(fixedExpression, functions)
+		expression, err := govaluate.NewEvaluableExpressionWithFunctions(exp, functions)
 		if err != nil {
-			errorsCollector = append(errorsCollector, EvalError{Source: key, Message: err.Error(), Expression: fixedExpression})
+			errorsCollector = append(errorsCollector, EvalError{Source: key, Message: err.Error(), Expression: exp})
 		} else {
 			equations[key] = *expression
 			log.Printf("vars  %v", expression.Vars())
@@ -83,6 +75,15 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 		} else {
 			log.Printf("%s = %v (%s)", key, v, parsedEquations.RawEquations[key])
 			solutions[key] = v
+		}
+
+		vBool, okBool := result.(bool)
+		if okBool {
+			solutions[key] = vBool
+		}
+		vString, okString := result.(string)
+		if okString {
+			solutions[key] = vString
 		}
 
 	}

@@ -21,6 +21,7 @@ func main() {
 	log.Printf("during parsing %v ", parsedEquations.Errors)
 	if len(parsedEquations.Errors) > 0 {
 		logErrors(parsedEquations.Errors)
+		os.Exit(1)
 	} else {
 		solutions, err := parsedEquations.Solve()
 		if err != nil {
@@ -37,6 +38,7 @@ func main() {
 
 			evalErrors = append(evalErrors, hesabuerr)
 			logErrors(evalErrors)
+			os.Exit(1)
 		} else {
 			logSolution(solutions)
 		}
@@ -85,6 +87,5 @@ func getEquations() map[string]string {
 		log.Printf("equations not loaded %v ", err)
 	}
 	log.Printf("equations loaded: %d ", len(results))
-	//log.Println("map:", results)
 	return results
 }

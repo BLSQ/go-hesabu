@@ -1,11 +1,19 @@
 package hesabu
 
 import (
-	"github.com/Knetic/govaluate"
 	"math"
+	"math/rand"
+
+	"github.com/Knetic/govaluate"
 )
 
 func Functions() map[string]govaluate.ExpressionFunction {
+	randbetweenFunction := func(args ...interface{}) (interface{}, error) {
+		min := args[0].(float64)
+		max := args[1].(float64)
+		result := min + rand.Float64()*(max-min)
+		return result, nil
+	}
 	accessFunction := func(args ...interface{}) (interface{}, error) {
 		//TODO
 		return args[1], nil
@@ -104,6 +112,8 @@ func Functions() map[string]govaluate.ExpressionFunction {
 		"SCORE_TABLE": scoreTableFunction,
 		"round":       roundFunction,
 		"ROUND":       roundFunction,
+		"randbetween": randbetweenFunction,
+		"RANDBETWEEN": randbetweenFunction,
 	}
 	return functions
 }
