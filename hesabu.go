@@ -16,7 +16,7 @@ func init() {
 
 func main() {
 
-	rawEquations := getEquations(os.Args[1])
+	rawEquations := getEquations()
 	parsedEquations := hesabu.Parse(rawEquations, hesabu.Functions())
 	log.Printf("during parsing %v ", parsedEquations.Errors)
 	if len(parsedEquations.Errors) > 0 {
@@ -59,15 +59,28 @@ func logSolution(solutions map[string]interface{}) {
 	fmt.Println(s)
 }
 
-func getEquations(file string) map[string]string {
-	raw, err := ioutil.ReadFile(file)
+func getEquations() map[string]string {
+	fi, err := os.Stdin.Stat()
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(-1)
+		panic(err)
 	}
-
+	var str []byte
+	if fi.Mode()&os.ModeNamedPipe == 0 {
+		raw, err := ioutil.ReadFile(os.Args[1])
+		if err != nil {
+			panic("file not read" + os.Args[1])
+		}
+		str = raw
+	} else {
+		raw, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			panic("pipe not read")
+		}
+		str = raw
+	}
+	log.Printf("equations to parse %s", string(str))
 	var results map[string]string
-	err = json.Unmarshal(raw, &results)
+	err = json.Unmarshal(str, &results)
 	if err != nil {
 		log.Printf("equations not loaded %v ", err)
 	}
