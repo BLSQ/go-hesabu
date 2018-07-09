@@ -5,57 +5,43 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 
 	"./hesabu"
-	"github.com/NYTimes/gziphandler"
 )
 
 func init() {
 	log.SetOutput(ioutil.Discard)
 }
-func handler(w http.ResponseWriter, request *http.Request) {
-	body, err := ioutil.ReadAll(request.Body)
-	if err != nil {
-		panic(err)
-	}
-	//log.Println(string(body))
-	var reqRawEquations map[string]interface{}
-	err = json.Unmarshal(body, &reqRawEquations)
-	if err != nil {
-		log.Printf("equations not loaded %v ", err)
-	}
-	rawEquations := make(map[string]string, len(reqRawEquations))
-	for k, v := range reqRawEquations {
-		rawEquations[k] = fmt.Sprintf("%v", v)
-	}
-	parsedEquations := hesabu.Parse(rawEquations, hesabu.Functions())
-	log.Printf("equations errors? %d ", len(parsedEquations.Errors))
-	solutions := parsedEquations.Solve()
-	b, _ := json.MarshalIndent(solutions, "", "  ")
-	s := string(b)
-	fmt.Fprintf(w, s)
-}
 
 func main() {
 
-	if os.Args[1] == "s" {
-		withoutGz := http.HandlerFunc(handler)
-		withGz := gziphandler.GzipHandler(withoutGz)
-		http.Handle("/", withGz)
-		log.Fatal(http.ListenAndServe(":8080", nil))
+	rawEquations := getEquations(os.Args[1])
+	parsedEquations := hesabu.Parse(rawEquations, hesabu.Functions())
+	log.Printf("during parsing %v ", parsedEquations.Errors)
+	if len(parsedEquations.Errors) > 0 {
+		logErrors(parsedEquations.Errors)
 	} else {
-		rawEquations := getEquations(os.Args[1])
-		parsedEquations := hesabu.Parse(rawEquations, hesabu.Functions())
-		log.Printf("during parsing %v ", parsedEquations.Errors)
-		if len(parsedEquations.Errors) > 0 {
-			logErrors(parsedEquations.Errors)
+		solutions, err := parsedEquations.Solve()
+		if err != nil {
+			var evalErrors []hesabu.EvalError
+			var hesabuerr hesabu.EvalError
+
+			ok, err2 := err.(*hesabu.CustomError)
+			if !err2 {
+				panic("ddd")
+			}
+			if ok != nil {
+				hesabuerr = ok.EvalError
+			}
+
+			evalErrors = append(evalErrors, hesabuerr)
+			logErrors(evalErrors)
 		} else {
-			solutions := parsedEquations.Solve()
 			logSolution(solutions)
 		}
 	}
+
 }
 
 func logErrors(errors []hesabu.EvalError) {
