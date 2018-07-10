@@ -139,6 +139,7 @@ func Functions() map[string]govaluate.ExpressionFunction {
 		"ABS":         absFunction,
 		"abs":         absFunction,
 		"access":      accessFunction,
+		"ACCESS":      accessFunction,
 		"score_table": scoreTableFunction,
 		"score_Table": scoreTableFunction,
 		"SCORE_TABLE": scoreTableFunction,
