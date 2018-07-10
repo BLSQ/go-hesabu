@@ -129,6 +129,8 @@ func Functions() map[string]govaluate.ExpressionFunction {
 		"MIN":         minFunction,
 		"Min":         minFunction,
 		"safe_div":    safeDivFuntion,
+		"SAFE_DIV":    safeDivFuntion,
+		"Safe_div":    safeDivFuntion,
 		"sum":         sumFunction,
 		"SUM":         sumFunction,
 		"Sum":         sumFunction,

@@ -1,0 +1,7 @@
+{
+    "quality_vaccination_attributed_points_for_vRC0stJ5y9Q_and_2015q1":"15",
+    "quality_clients_sous_traitement_arv_suivi_pendant_les_6_premiers_mois_attributed_points_for_vRC0stJ5y9Q_and_2015q1":"18",
+    "quality_vaccination_max_points_for_vRC0stJ5y9Q_and_2015q1": "17",
+    "quality_clients_sous_traitement_arv_suivi_pendant_les_6_premiers_mois_max_points_for_vRC0stJ5y9Q_and_2015q1": "19",
+    "test": "SAFE_DIV(SUM(quality_vaccination_attributed_points_for_vRC0stJ5y9Q_and_2015q1, quality_clients_sous_traitement_arv_suivi_pendant_les_6_premiers_mois_attributed_points_for_vRC0stJ5y9Q_and_2015q1),SUM(quality_vaccination_max_points_for_vRC0stJ5y9Q_and_2015q1, quality_clients_sous_traitement_arv_suivi_pendant_les_6_premiers_mois_max_points_for_vRC0stJ5y9Q_and_2015q1)) * 100.0"
+}
