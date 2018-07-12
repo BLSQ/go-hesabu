@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"./hesabu"
+	"github.com/BLSQ/go-hesabu/hesabu"
 )
 
 func init() {
