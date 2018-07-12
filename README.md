@@ -12,6 +12,8 @@ cd go-hesabu
 dep ensure
 go run hesabu.go ./test/small.json
 ```
+
+For more info see workspace structure in https://golang.org/doc/code.html
 # Usage
 Taking equations
 
