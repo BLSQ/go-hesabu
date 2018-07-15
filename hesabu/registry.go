@@ -50,81 +50,88 @@ func scoreTableFunction(args ...interface{}) (interface{}, error) {
 	return args[0], nil
 }
 
+func accessFunction(args ...interface{}) (interface{}, error) {
+	index := int(args[len(args)-1].(float64))
+	return args[index], nil
+}
+
+func roundFunction(args ...interface{}) (interface{}, error) {
+	places := 0
+	if len(args) == 2 {
+		places = int(args[1].(float64))
+	}
+	f := args[0].(float64)
+	shift := math.Pow(10, float64(places))
+	return (math.Round(f*shift) / shift), nil
+}
+
+func absFunction(args ...interface{}) (interface{}, error) {
+	return math.Abs(args[0].(float64)), nil
+}
+
+func ifFunction(args ...interface{}) (interface{}, error) {
+	var result interface{}
+	if args[0].(bool) {
+		result = args[1]
+	} else {
+		result = args[2]
+	}
+	return result, nil
+}
+
+func safeDivFuntion(args ...interface{}) (interface{}, error) {
+	if args[1].(float64) == 0 {
+		return float64(0), nil
+	}
+	return (args[0].(float64) / args[1].(float64)), nil
+}
+
+func maxFunction(args ...interface{}) (interface{}, error) {
+	max := args[0].(float64)
+	for _, arg := range args {
+		if arg.(float64) > max {
+			max = arg.(float64)
+		}
+	}
+	return max, nil
+}
+
+func minFunction(args ...interface{}) (interface{}, error) {
+	min := args[0].(float64)
+	for _, arg := range args {
+		if arg.(float64) < min {
+			min = arg.(float64)
+		}
+	}
+	return min, nil
+}
+
+func sumFunction(args ...interface{}) (interface{}, error) {
+	total := float64(0.0)
+	for _, arg := range args {
+		total += arg.(float64)
+	}
+	return total, nil
+}
+
+func averageFunction(args ...interface{}) (interface{}, error) {
+	total := float64(0)
+	for _, x := range args {
+		total += x.(float64)
+	}
+	return (total / float64(len(args))), nil
+}
+
+func strlen(args ...interface{}) (interface{}, error) {
+	length := len(args[0].(string))
+	return (float64)(length), nil
+}
+
 // Functions return function registry
 func Functions() map[string]govaluate.ExpressionFunction {
 
-	accessFunction := func(args ...interface{}) (interface{}, error) {
-		index := int(args[len(args)-1].(float64))
-		return args[index], nil
-	}
-
-	absFunction := func(args ...interface{}) (interface{}, error) {
-		return math.Abs(args[0].(float64)), nil
-	}
-	roundFunction := func(args ...interface{}) (interface{}, error) {
-		places := 0
-		if len(args) == 2 {
-			places = int(args[1].(float64))
-		}
-		f := args[0].(float64)
-		shift := math.Pow(10, float64(places))
-		return (math.Round(f*shift) / shift), nil
-	}
-
-	ifFunction := func(args ...interface{}) (interface{}, error) {
-		var result interface{}
-		if args[0].(bool) {
-			result = args[1]
-		} else {
-			result = args[2]
-		}
-		return result, nil
-	}
-	maxFunction := func(args ...interface{}) (interface{}, error) {
-		max := args[0].(float64)
-		for _, arg := range args {
-			if arg.(float64) > max {
-				max = arg.(float64)
-			}
-		}
-		return max, nil
-	}
-	minFunction := func(args ...interface{}) (interface{}, error) {
-		min := args[0].(float64)
-		for _, arg := range args {
-			if arg.(float64) < min {
-				min = arg.(float64)
-			}
-		}
-		return min, nil
-	}
-	sumFunction := func(args ...interface{}) (interface{}, error) {
-		total := float64(0.0)
-		for _, arg := range args {
-			total += arg.(float64)
-		}
-		return total, nil
-	}
-
-	averageFunction := func(args ...interface{}) (interface{}, error) {
-		total := float64(0)
-		for _, x := range args {
-			total += x.(float64)
-		}
-		return (total / float64(len(args))), nil
-	}
-
-	safeDivFuntion := func(args ...interface{}) (interface{}, error) {
-		if args[1].(float64) == 0 {
-			return float64(0), nil
-		}
-		return (args[0].(float64) / args[1].(float64)), nil
-	}
 	functions := map[string]govaluate.ExpressionFunction{
-		"strlen": func(args ...interface{}) (interface{}, error) {
-			length := len(args[0].(string))
-			return (float64)(length), nil
-		},
+		"strlen":      strlen,
 		"if":          ifFunction,
 		"IF":          ifFunction,
 		"If":          ifFunction,
