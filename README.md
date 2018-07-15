@@ -13,6 +13,7 @@ cd ~/go/src/github.com/BLSQ
 git clone git@github.com:BLSQ/go-hesabu.git
 cd go-hesabu
 dep ensure
+go test github.com/BLSQ/go-hesabu/hesabu
 go run hesabu.go ./test/small.json
 ```
 
