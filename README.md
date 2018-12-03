@@ -44,14 +44,13 @@ you will get
 
 ## Development setup
 
-require a go 1.9 and dep
+require a go 1.11
 
 ```
 mkdir -p $GOPATH/src/github.com/BLSQ
 cd $GOPATH/src/github.com/BLSQ
 git clone git@github.com:BLSQ/go-hesabu.git
 cd go-hesabu
-dep ensure
 go test github.com/BLSQ/go-hesabu/hesabu -coverprofile=coverage.out
 go tool cover -html=coverage.out
 go run hesabu.go ./test/small.json
