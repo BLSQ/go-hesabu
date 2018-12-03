@@ -61,6 +61,22 @@ For more info see workspace structure in https://golang.org/doc/code.html
 
 ## build the cli
 
+### if you don't have golang setup
+
+you can use docker
+
+for linux binary
+```
+./bin/build.sh ""
+```
+
+for macos binary
+```
+./bin/build.sh "-e GOOS=darwin GOARCH=amd64 "
+```
+
+### if you have golang
+
 ```
 go build -ldflags="-s -w" -o hesabucli hesabu.go; mv hesabucli ../hesabu/bin
 ```
@@ -70,6 +86,8 @@ for mac
 ```
 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o hesabucli hesabu.go
 ```
+
+
 
 ## releasing
 
