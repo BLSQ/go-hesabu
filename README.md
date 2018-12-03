@@ -1,5 +1,6 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/521737120ca70381247d/maintainability)](https://codeclimate.com/github/BLSQ/go-hesabu/maintainability)
 [![Go Report Card](https://goreportcard.com/badge/github.com/BLSQ/go-hesabu)](https://goreportcard.com/report/github.com/BLSQ/go-hesabu)
+[![Build Status](https://travis-ci.org/BLSQ/go-hesabu.svg?branch=master)](https://travis-ci.org/BLSQ/go-hesabu)
 
 # go-hesabu
 go-hesabu is golang equivalent to hesabu
