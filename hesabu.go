@@ -10,6 +10,12 @@ import (
 	"github.com/BLSQ/go-hesabu/hesabu"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func init() {
 	if os.Getenv("HESABU_DEBUG") == "true" {
 		log.SetOutput(os.Stderr)
@@ -19,7 +25,10 @@ func init() {
 }
 
 func main() {
-
+	if os.Getenv("HESABU_HELP") == "true" {
+		fmt.Printf("%v, commit %v, built at %v\n", version, commit, date)
+		return
+	}
 	rawEquations := getEquations()
 	parsedEquations := hesabu.Parse(rawEquations, hesabu.Functions())
 	if len(parsedEquations.Errors) > 0 {
