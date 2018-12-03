@@ -70,6 +70,25 @@ for mac
 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o hesabucli hesabu.go
 ```
 
+## releasing
+
+have goreleaser https://goreleaser.com/install/
+
+on ubuntu : `snap install goreleaser --classic`
+
+for github token, use scope repo and see : https://github.com/settings/tokens/new
+
+```
+export GITHUB_TOKEN=...
+rm -rf ./dist/
+git tag -a v0.0.3 -m "First release with goreleaser"
+git push origin v0.0.3
+goreleaser release
+```
+
+check the release page https://github.com/BLSQ/go-hesabu/releases/
+
+
 ## Dependencies
 
 relies on
