@@ -29,7 +29,19 @@ func main() {
 		fmt.Printf("%v, commit %v, built at %v\n", version, commit, date)
 		return
 	}
-	rawEquations := getEquations()
+	rawEquations, error := getEquations()
+	if error != nil {
+		errs := []hesabu.EvalError{
+			{
+				Message: "Invalid JSON",
+				Source: "general",
+				Expression: "general",
+			},
+		}
+		logErrors(errs)
+		os.Exit(1)
+	}
+
 	parsedEquations := hesabu.Parse(rawEquations, hesabu.Functions())
 	if len(parsedEquations.Errors) > 0 {
 		logErrors(parsedEquations.Errors)
@@ -72,7 +84,7 @@ func logSolution(solutions map[string]interface{}) {
 	fmt.Println(s)
 }
 
-func getEquations() map[string]string {
+func getEquations() (map[string]string, error) {
 	fi, err := os.Stdin.Stat()
 	if err != nil {
 		panic(err)
@@ -96,7 +108,8 @@ func getEquations() map[string]string {
 	err = json.Unmarshal(str, &results)
 	if err != nil {
 		log.Printf("equations not loaded %v ", err)
+		return nil, err
 	}
 	log.Printf("equations loaded: %d ", len(results))
-	return results
+	return results, nil
 }
