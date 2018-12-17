@@ -1,6 +1,7 @@
 package hesabu
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 
@@ -71,7 +72,12 @@ func absFunction(args ...interface{}) (interface{}, error) {
 
 func ifFunction(args ...interface{}) (interface{}, error) {
 	var result interface{}
-	if args[0].(bool) {
+	bool, ok := args[0].(bool)
+	if !ok {
+		return nil, fmt.Errorf("Expected '%v' to be a boolean expression.", args[0])
+	}
+
+	if bool {
 		result = args[1]
 	} else {
 		result = args[2]
