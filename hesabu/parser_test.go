@@ -13,32 +13,32 @@ type ParserTest struct {
 
 func TestCleaner(t *testing.T) {
 	parserTests := []ParserTest{
-		ParserTest{
+		{
 			Name:     "Sanity check",
 			Input:    "a + b",
 			Expected: "a + b",
 		},
-		ParserTest{
+		{
 			Name:     "Replace AND",
 			Input:    "a AND b",
 			Expected: "a && b",
 		},
-		ParserTest{
+		{
 			Name:     "Replace OR",
 			Input:    "a OR b",
 			Expected: "a || b",
 		},
-		ParserTest{
+		{
 			Name:     "Leaves <= alone",
 			Input:    "a <= b",
 			Expected: "a <= b",
 		},
-		ParserTest{
+		{
 			Name:     "Leaves == alone",
 			Input:    "a == b",
 			Expected: "a == b",
 		},
-		ParserTest{
+		{
 			Name:     "Replace single = with ==",
 			Input:    "a=b && b     =     c && d = e",
 			Expected: "a==b && b    ==    c && d==e",
