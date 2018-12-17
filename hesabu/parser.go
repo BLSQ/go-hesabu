@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"regexp"
 
 	"github.com/Knetic/govaluate"
 	toposort "github.com/otaviokr/topological-sort"
@@ -43,6 +44,7 @@ func Parse(rawEquations map[string]string, functions map[string]govaluate.Expres
 	equations := make(map[string]govaluate.EvaluableExpression, len(rawEquations))
 	equationDependencies := make(map[string][]string, len(rawEquations))
 	for key, exp := range rawEquations {
+		exp = clean(exp)
 		// https://github.com/Knetic/govaluate/blob/master/EvaluableExpression.go
 		expression, err := govaluate.NewEvaluableExpressionWithFunctions(exp, functions)
 		if err != nil {
@@ -101,4 +103,23 @@ func (parsedEquations ParsedEquations) newSingleError(key string, message string
 	equation := parsedEquations.RawEquations[key]
 	evalError := EvalError{Message: message, Source: key, Expression: equation}
 	return make(map[string]interface{}), &CustomError{EvalError: evalError}
+}
+
+// There can still be legacy formulas that use the old AND, OR and '='
+// syntax, the clean method will replace this with:
+//       AND => &&
+//       OR => ||
+//       = => == (only for equality comparison)
+//
+func clean(expression string) (cleanExpression string) {
+	and_regex := regexp.MustCompile(`(?i)\bAND\b`)
+	or_regex := regexp.MustCompile(`(?i)\bOR\b`)
+	single_equals_regex := regexp.MustCompile(`(\b|\s)(=)(\b|\s)`)
+
+	cleanExpression = expression
+	cleanExpression = and_regex.ReplaceAllString(cleanExpression, "&&")
+	cleanExpression = or_regex.ReplaceAllString(cleanExpression, "||")
+	cleanExpression = single_equals_regex.ReplaceAllString(cleanExpression, "==")
+
+	return cleanExpression
 }
