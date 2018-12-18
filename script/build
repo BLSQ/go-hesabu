@@ -1,0 +1,11 @@
+#! /bin/sh
+#
+# Stop on error
+set -e
+
+echo " -> Building"
+
+bindir="${PWD}/bin"
+go build -ldflags="-s -w" -o "${bindir}/hesabucli" hesabu.go
+
+echo " -> New build at: ${bindir}/hesabucli"

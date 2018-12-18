@@ -1,0 +1,16 @@
+{
+    "a": "1",
+    "b": "2",
+    "c": "3",
+    "d": "4",
+    "e": "5",
+    "a_bool": "a == a",
+    "b_bool": "b == b",
+    "Input":    "a + b",
+    "Input_AND":    "a_bool AND b_bool",
+    "Input_OR":     "a_bool OR b_bool",
+    "untouched_lower": "a <= b",
+    "untouched_equal": "a == b",
+    "equal_and_spaces": "a=b && b     =     c && d = e",
+    "pass": "untouched_lower == true && untouched_equal == false && equal_and_spaces==false && a_bool == true && b_bool == true && Input_AND==true && Input_OR == true"
+}

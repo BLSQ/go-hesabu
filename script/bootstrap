@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# script/bootstrap: Resolve all dependencies that the application requires to
+#                   run.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "==> Checking go..."
+which go >/dev/null 2>&1  || {
+    cat <<"GOLANG"
+You need to install Go
+
+Visit https://golang.org/doc/install for instructions
+GOLANG
+    exit 1
+}

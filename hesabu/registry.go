@@ -1,6 +1,7 @@
 package hesabu
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 
@@ -25,7 +26,7 @@ func randbetweenFunction(args ...interface{}) (interface{}, error) {
 */
 func scoreTableFunction(args ...interface{}) (interface{}, error) {
 	target := args[0].(float64)
-	rules := args[1:len(args)]
+	rules := args[1:]
 	chunkSize := 3
 	for i := 0; i < len(rules); i += chunkSize {
 		end := i + chunkSize
@@ -71,7 +72,12 @@ func absFunction(args ...interface{}) (interface{}, error) {
 
 func ifFunction(args ...interface{}) (interface{}, error) {
 	var result interface{}
-	if args[0].(bool) {
+	bool, ok := args[0].(bool)
+	if !ok {
+		return nil, fmt.Errorf("Expected '%v' to be a boolean expression.", args[0])
+	}
+
+	if bool {
 		result = args[1]
 	} else {
 		result = args[2]

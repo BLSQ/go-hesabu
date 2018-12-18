@@ -1,0 +1,19 @@
+#! /bin/sh
+#
+# Stop on error
+set -ex
+
+cd "$(dirname "$0")/.."
+
+echo " -> Verifying formatting"
+# Verified using: 'gofmt -s -w  hesabu.go hesabu/*.go'"
+gofmt -s -w hesabu.go hesabu/*.go
+
+git diff --exit-code --quiet || {
+    echo "go fmt changed source files"
+    echo "Please run: gofmt -s -w  hesabu.go hesabu/*.go"
+    exit 1
+}
+
+echo "Running unit tests"
+script/test
