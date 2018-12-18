@@ -1,8 +1,9 @@
 package hesabu
 
 import (
-	"github.com/Knetic/govaluate"
 	"testing"
+
+	"github.com/Knetic/govaluate"
 )
 
 type ParserTest struct {
@@ -24,8 +25,18 @@ func TestCleaner(t *testing.T) {
 			Expected: "a && b",
 		},
 		{
+			Name:     "Replace and",
+			Input:    "a and b",
+			Expected: "a && b",
+		},
+		{
 			Name:     "Replace OR",
 			Input:    "a OR b",
+			Expected: "a || b",
+		},
+		{
+			Name:     "Replace or",
+			Input:    "a or b",
 			Expected: "a || b",
 		},
 		{
@@ -42,6 +53,16 @@ func TestCleaner(t *testing.T) {
 			Name:     "Replace single = with ==",
 			Input:    "a=b && b     =     c && d = e",
 			Expected: "a==b && b    ==    c && d==e",
+		},
+		{
+			Name:     "Leaves alone variable containing AND",
+			Input:    "operand=1",
+			Expected: "operand==1",
+		},
+		{
+			Name:     "Leaves alone variable containing or",
+			Input:    "operator=1",
+			Expected: "operator==1",
 		},
 	}
 	runEvaluationTests(parserTests, t)
