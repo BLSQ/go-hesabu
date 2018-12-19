@@ -28,6 +28,13 @@ func TestGeneric(t *testing.T) {
 
 		{"if", []interface{}{true, 9000, 3}, 9000},
 		{"if", []interface{}{false, 2, 9000}, 9000},
+
+		{"avg", []interface{}{1.0, 2.0, 3.0}, 2.0},
+
+		{"sum", []interface{}{1.0, 2.0, 3.0}, 6.0},
+
+		{"round", []interface{}{33.3333333}, 33.0},
+		{"round", []interface{}{33.3333333, 2.0}, 33.33},
 	}
 
 	for _, table := range tables {
