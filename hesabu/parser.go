@@ -127,7 +127,6 @@ func clean(expression string) (cleanExpression string) {
 	cleanExpression = strings.Replace(cleanExpression, " and ", " && ", -1)
 	cleanExpression = strings.Replace(cleanExpression, " or ", " || ", -1)
 
-
 	if strings.Contains(expression, "=") {
 		cleanExpression = replaceSingleEquals(expression)
 	}

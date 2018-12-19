@@ -1,16 +1,16 @@
 package hesabu
 
 import (
-	"testing"
 	"encoding/json"
-	"io/ioutil"
 	"github.com/Knetic/govaluate"
+	"io/ioutil"
+	"testing"
 )
 
 type ParserTest struct {
-	Name     string
-	Input    string
-	Expected string
+	Name                 string
+	Input                string
+	Expected             string
 	ExpectedErrorMessage string
 }
 
@@ -67,13 +67,13 @@ func TestCleaner(t *testing.T) {
 			Expected: "operator==1",
 		},
 		{
-			Name:     "Malformed formulas return an error",
-			Input:    "=operator=1",
+			Name:                 "Malformed formulas return an error",
+			Input:                "=operator=1",
 			ExpectedErrorMessage: "Invalid token: '='",
 		},
 		{
-			Name:     "Malformed formulas return an error",
-			Input:    "operator=1=",
+			Name:                 "Malformed formulas return an error",
+			Input:                "operator=1=",
 			ExpectedErrorMessage: "Invalid token: '='",
 		},
 	}

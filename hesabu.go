@@ -33,8 +33,8 @@ func main() {
 	if error != nil {
 		errs := []hesabu.EvalError{
 			{
-				Message: "Invalid JSON",
-				Source: "general",
+				Message:    "Invalid JSON",
+				Source:     "general",
 				Expression: "general",
 			},
 		}
