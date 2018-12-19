@@ -10,4 +10,5 @@ before_script:
 script:
   - script/cibuild
 after_script:
+  - mv coverage.out c.out
   - ./cc-test-reporter after-build -t gocov --exit-code $TRAVIS_TEST_RESULT
