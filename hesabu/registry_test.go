@@ -61,3 +61,17 @@ func TestIfFunctionWithIncorrectBool(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestRandBetweenFunction(t *testing.T) {
+	inputData := []interface{}{1.0, 10.0}
+	value, err := Functions()["randbetween"](inputData...)
+	if err != nil {
+		t.Logf("1 is not a bool, this should have failed")
+		t.Fail()
+	}
+	fvalue := value.(float64)
+	if fvalue < 1.0 || fvalue > 10.0 {
+		t.Logf("1 is not a bool, this should have failed")
+		t.Fail()
+	}
+}
