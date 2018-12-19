@@ -20,6 +20,12 @@ func TestGeneric(t *testing.T) {
 		{"min", []interface{}{-1.0, 5.0}, -1.0},
 		{"min", []interface{}{-1.0, -2.0}, -2.0},
 
+		{"score_table", []interface{}{1.0, 0.0, 2.0, 50.0, 2.0, 10.0, 95.0}, 50.0},
+		{"score_table", []interface{}{3.0, 0.0, 2.0, 50.0, 2.0, 10.0, 95.0}, 95.0},
+
+		{"safe_div", []interface{}{1.0, 0.0}, 0.0},
+		{"safe_div", []interface{}{8.0, 2.0}, 4.0},
+
 		{"if", []interface{}{true, 9000, 3}, 9000},
 		{"if", []interface{}{false, 2, 9000}, 9000},
 	}
