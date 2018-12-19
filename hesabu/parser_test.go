@@ -85,6 +85,7 @@ func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
 	for _, parserTest := range parserTests {
 		equations := map[string]string{"testing": parserTest.Input}
 		parsedEquations := Parse(equations, functions)
+		parsedEquations.Solve()
 		if parserTest.Expected != "" {
 			if len(parsedEquations.Errors) < 0 {
 				t.Logf("%s - had an error but should not have had", parserTest.Name)
