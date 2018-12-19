@@ -5,6 +5,8 @@ import (
 	"log"
 	"math"
 	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/Knetic/govaluate"
 	toposort "github.com/otaviokr/topological-sort"
@@ -105,6 +107,15 @@ func (parsedEquations ParsedEquations) newSingleError(key string, message string
 	return make(map[string]interface{}), &CustomError{EvalError: evalError}
 }
 
+var and_regex = regexp.MustCompile(`(?i)\bAND\b`)
+var or_regex = regexp.MustCompile(`(?i)\bOR\b`)
+var single_equals_regex = regexp.MustCompile(`(\b|\s)(=)(\b|\s)`)
+
+func isNumeric(s string) bool {
+	_, err := strconv.ParseFloat(s, 64)
+	return err == nil
+}
+
 // There can still be legacy formulas that use the old AND, OR and '='
 // syntax, the clean method will replace this with:
 //       AND => &&
@@ -112,14 +123,19 @@ func (parsedEquations ParsedEquations) newSingleError(key string, message string
 //       = => == (only for equality comparison)
 //
 func clean(expression string) (cleanExpression string) {
-	and_regex := regexp.MustCompile(`(?i)\bAND\b`)
-	or_regex := regexp.MustCompile(`(?i)\bOR\b`)
-	single_equals_regex := regexp.MustCompile(`(\b|\s)(=)(\b|\s)`)
-
+	if isNumeric(expression) {
+		return expression
+	}
 	cleanExpression = expression
-	cleanExpression = and_regex.ReplaceAllString(cleanExpression, "&&")
-	cleanExpression = or_regex.ReplaceAllString(cleanExpression, "||")
-	cleanExpression = single_equals_regex.ReplaceAllString(cleanExpression, "==")
+	if strings.Contains(expression, "and") ||
+		strings.Contains(expression, "AND") ||
+		strings.Contains(expression, "OR") ||
+		strings.Contains(expression, "or") ||
+		strings.Contains(expression, "=") {
+		cleanExpression = and_regex.ReplaceAllString(cleanExpression, "&&")
+		cleanExpression = or_regex.ReplaceAllString(cleanExpression, "||")
+		cleanExpression = single_equals_regex.ReplaceAllString(cleanExpression, "==")
+	}
 
 	return cleanExpression
 }
