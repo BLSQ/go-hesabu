@@ -4,7 +4,6 @@
 set -ex
 
 cd "$(dirname "$0")/.."
-
 echo " -> Verifying formatting"
 # Verified using: 'gofmt -s -w  hesabu.go hesabu/*.go'"
 gofmt -s -w hesabu.go hesabu/*.go
@@ -17,3 +16,6 @@ git diff --exit-code --quiet || {
 
 echo "Running unit tests"
 script/test
+
+echo "Running examples"
+sh test/example_runners.sh
