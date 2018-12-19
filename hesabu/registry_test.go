@@ -35,6 +35,9 @@ func TestGeneric(t *testing.T) {
 
 		{"round", []interface{}{33.3333333}, 33.0},
 		{"round", []interface{}{33.3333333, 2.0}, 33.33},
+
+		{"abs", []interface{}{1.0}, 1.0},
+		{"abs", []interface{}{-1.0}, 1.0},
 	}
 
 	for _, table := range tables {
