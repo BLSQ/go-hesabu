@@ -12,6 +12,7 @@ type ParserTest struct {
 	Input                string
 	Expected             string
 	ExpectedErrorMessage string
+	Solution             interface{}
 }
 
 func TestCleaner(t *testing.T) {
@@ -20,41 +21,49 @@ func TestCleaner(t *testing.T) {
 			Name:     "Sanity check",
 			Input:    "a + b",
 			Expected: "a + b",
+			Solution: 3.0,
 		},
 		{
 			Name:     "Replace AND",
-			Input:    "a AND b",
-			Expected: "a && b",
+			Input:    "abool AND bbool",
+			Expected: "abool && bbool",
+			Solution: false,
 		},
 		{
 			Name:     "Replace and",
-			Input:    "a and b",
-			Expected: "a && b",
+			Input:    "abool and bbool",
+			Expected: "abool && bbool",
+			Solution: false,
 		},
 		{
 			Name:     "Replace OR",
-			Input:    "a OR b",
-			Expected: "a || b",
+			Input:    "abool OR bbool",
+			Expected: "abool || bbool",
+			Solution: true,
 		},
 		{
 			Name:     "Replace or",
-			Input:    "a or b",
-			Expected: "a || b",
+			Input:    "abool or bbool",
+			Expected: "abool || bbool",
+			Solution: true,
 		},
 		{
 			Name:     "Leaves <= alone",
 			Input:    "a <= b",
 			Expected: "a <= b",
+			Solution: true,
 		},
 		{
 			Name:     "Leaves == alone",
 			Input:    "a == b",
 			Expected: "a == b",
+			Solution: false,
 		},
 		{
 			Name:     "Replace single = with ==",
 			Input:    "a=b && b     =     c && d = e",
 			Expected: "a==b && b     ==     c && d == e",
+			Solution: false,
 		},
 		{
 			Name:     "Leaves alone variable containing AND",
@@ -83,9 +92,25 @@ func TestCleaner(t *testing.T) {
 func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
 	functions := map[string]govaluate.ExpressionFunction{}
 	for _, parserTest := range parserTests {
-		equations := map[string]string{"testing": parserTest.Input}
+		equations := map[string]string{
+			"abool":   "true",
+			"bbool":   "false",
+			"a":       "1",
+			"b":       "2",
+			"testing": parserTest.Input,
+		}
 		parsedEquations := Parse(equations, functions)
 		if parserTest.Expected != "" {
+			solution, err := parsedEquations.Solve()
+			if err != nil {
+				t.Logf("err not nil : %s", err)
+			} else {
+				if parserTest.Solution != nil && parserTest.Solution != solution["testing"] {
+					t.Logf("Test '%s' '%F' vs '%s'", parserTest.Name, parserTest.Solution, solution["testing"])
+					t.Fail()
+					continue
+				}
+			}
 			if len(parsedEquations.Errors) < 0 {
 				t.Logf("%s - had an error but should not have had", parserTest.Name)
 				t.Fail()

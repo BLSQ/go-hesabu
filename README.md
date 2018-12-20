@@ -52,6 +52,7 @@ cd $GOPATH/src/github.com/BLSQ
 git clone git@github.com:BLSQ/go-hesabu.git
 cd go-hesabu
 go test github.com/BLSQ/go-hesabu/hesabu -coverprofile=coverage.out
+go tool cover -func=coverage.out
 go tool cover -html=coverage.out
 go run hesabu.go ./test/small.json
 ```
