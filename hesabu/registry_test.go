@@ -66,12 +66,12 @@ func TestRandBetweenFunction(t *testing.T) {
 	inputData := []interface{}{1.0, 10.0}
 	value, err := Functions()["randbetween"](inputData...)
 	if err != nil {
-		t.Logf("1 is not a bool, this should have failed")
+		t.Logf("randbetween shouldn't return error")
 		t.Fail()
 	}
 	fvalue := value.(float64)
 	if fvalue < 1.0 || fvalue > 10.0 {
-		t.Logf("1 is not a bool, this should have failed")
+		t.Logf("randbetween should generate within range specified")
 		t.Fail()
 	}
 }
