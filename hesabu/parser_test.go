@@ -15,6 +15,52 @@ type ParserTest struct {
 	Solution             interface{}
 }
 
+func TestCleanerLeavesAlone(t *testing.T) {
+	leave_me_alones := []string{"a<=basic",
+		"a>=basic",
+		"a==basic",
+		"a!=basic",
+		"a <=basic",
+		"a >=basic",
+		"a ==basic",
+		"a!= basic",
+		"a <= basic",
+		"a >= basic",
+		"a == basic",
+		"a != basic",
+		"a<= basic",
+		"a>= basic",
+		"a== basic",
+		"a !=basic"}
+
+	var parserTests []ParserTest
+	for _, leave_me_alone := range leave_me_alones {
+		parserTests = append(parserTests, ParserTest{
+			Name:     leave_me_alone,
+			Input:    leave_me_alone,
+			Expected: leave_me_alone,
+		})
+	}
+	runEvaluationTests(parserTests, t)
+}
+
+func TestCleanerSingleEquals(t *testing.T) {
+	replace_single_equals := map[string]string{
+		"a=b":  "a==b",
+		"a =b": "a ==b",
+		"a= b": "a== b",
+	}
+	var parserTests []ParserTest
+	for input, output := range replace_single_equals {
+		parserTests = append(parserTests, ParserTest{
+			Name:     input,
+			Input:    input,
+			Expected: output,
+		})
+	}
+	runEvaluationTests(parserTests, t)
+}
+
 func TestCleaner(t *testing.T) {
 	parserTests := []ParserTest{
 		{
@@ -48,22 +94,15 @@ func TestCleaner(t *testing.T) {
 			Solution: true,
 		},
 		{
-			Name:     "Leaves <= alone",
-			Input:    "a <= b",
-			Expected: "a <= b",
-			Solution: true,
-		},
-		{
-			Name:     "Leaves == alone",
-			Input:    "a == b",
-			Expected: "a == b",
-			Solution: false,
-		},
-		{
 			Name:     "Replace single = with ==",
 			Input:    "a=b && b     =     c && d = e",
 			Expected: "a==b && b     ==     c && d == e",
 			Solution: false,
+		},
+		{
+			Name:     "AND and equals",
+			Input:    "(a == 1) AND (b = 2) or (a = 1) || (b == 2)",
+			Expected: "(a == 1) && (b == 2) || (a == 1) || (b == 2)",
 		},
 		{
 			Name:     "Leaves alone variable containing AND",
@@ -90,11 +129,12 @@ func TestCleaner(t *testing.T) {
 }
 
 func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
-	functions := map[string]govaluate.ExpressionFunction{}
+	functions := Functions() //map[string]govaluate.ExpressionFunction{}
 	for _, parserTest := range parserTests {
 		equations := map[string]string{
 			"abool":   "true",
 			"bbool":   "false",
+			"basic":   "4",
 			"a":       "1",
 			"b":       "2",
 			"testing": parserTest.Input,
@@ -106,7 +146,7 @@ func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
 				t.Logf("err not nil : %s", err)
 			} else {
 				if parserTest.Solution != nil && parserTest.Solution != solution["testing"] {
-					t.Logf("Test '%s' '%F' vs '%s'", parserTest.Name, parserTest.Solution, solution["testing"])
+					t.Logf("Test '%s' '%s' vs '%s'", parserTest.Name, parserTest.Solution, solution["testing"])
 					t.Fail()
 					continue
 				}

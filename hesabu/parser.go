@@ -127,8 +127,8 @@ func clean(expression string) (cleanExpression string) {
 	cleanExpression = strings.Replace(cleanExpression, " and ", " && ", -1)
 	cleanExpression = strings.Replace(cleanExpression, " or ", " || ", -1)
 
-	if strings.Contains(expression, "=") {
-		cleanExpression = replaceSingleEquals(expression)
+	if strings.Contains(cleanExpression, "=") {
+		cleanExpression = replaceSingleEquals(cleanExpression)
 	}
 
 	return cleanExpression
@@ -159,7 +159,7 @@ func needsCleaning(expression string) bool {
 // third slower than not using a regex.
 func replaceSingleEquals(in string) string {
 	// Characters that combined with an equal form a special symbol
-	reserved := map[byte]int{'=': 1, '<': 1, '>': 1}
+	reserved := map[byte]int{'=': 1, '<': 1, '>': 1, '!': 1}
 	var t = []rune{}
 
 	// Loop over the runes from the in string
