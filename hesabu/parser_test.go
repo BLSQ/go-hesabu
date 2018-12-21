@@ -100,6 +100,11 @@ func TestCleaner(t *testing.T) {
 			Solution: false,
 		},
 		{
+			Name:     "AND and equals",
+			Input:    "(a == 1) AND (b = 2) or (a = 1) || (b == 2)",
+			Expected: "(a == 1) && (b == 2) || (a == 1) || (b == 2)",
+		},
+		{
 			Name:     "Leaves alone variable containing AND",
 			Input:    "operand=1",
 			Expected: "operand==1",
