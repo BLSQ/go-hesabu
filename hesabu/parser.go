@@ -159,7 +159,7 @@ func needsCleaning(expression string) bool {
 // third slower than not using a regex.
 func replaceSingleEquals(in string) string {
 	// Characters that combined with an equal form a special symbol
-	reserved := map[byte]int{'=': 1, '<': 1, '>': 1}
+	reserved := map[byte]int{'=': 1, '<': 1, '>': 1, '!': 1}
 	var t = []rune{}
 
 	// Loop over the runes from the in string
