@@ -66,29 +66,19 @@ For more info see workspace structure in https://golang.org/doc/code.html
 
 you can use docker
 
-for linux binary
 ```
-./bin/build.sh ""
+script/docker-build
 ```
 
-for macos binary
-```
-./bin/build.sh "-e GOOS=darwin GOARCH=amd64 "
-```
+Which will generate both a Mac version and a Linux version in the bin folder.
 
 ### if you have golang
 
 ```
-go build -ldflags="-s -w" -o hesabucli hesabu.go; mv hesabucli ../hesabu/bin
+script/build
 ```
 
-for mac
-
-```
-GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o hesabucli hesabu.go
-```
-
-
+Which will generate both a Mac version and a Linux version in the bin folder.
 
 ## releasing
 
