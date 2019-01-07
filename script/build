@@ -6,6 +6,9 @@ set -e
 echo " -> Building"
 
 bindir="${PWD}/bin"
-go build -ldflags="-s -w" -o "${bindir}/hesabucli" hesabu.go
 
-echo " -> New build at: ${bindir}/hesabucli"
+GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o "${bindir}/hesabucli-mac" hesabu.go
+GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o "${bindir}/hesabucli" hesabu.go
+
+echo " -> New mac build at: ./bin/hesabucli-mac"
+echo " -> New build at: ./bin/hesabucli"
