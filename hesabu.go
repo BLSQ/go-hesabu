@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"runtime"
+	"runtime/pprof"
 	"os"
 
 	"github.com/BLSQ/go-hesabu/hesabu"
@@ -20,6 +22,8 @@ var (
 
 var debugFlag = flag.Bool("d", false, "Extra debug logging")
 var versionFlag = flag.Bool("v", false, "Prints version")
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
+var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
 func init() {
 	flag.Parse()
@@ -34,6 +38,17 @@ func init() {
 	} else {
 		log.SetOutput(ioutil.Discard)
 	}
+
+	if *cpuprofile != "" {
+		fmt.Printf("o hai there")
+        f, err := os.Create(*cpuprofile)
+        if err != nil {
+            log.Fatal("could not create CPU profile: ", err)
+        }
+        if err := pprof.StartCPUProfile(f); err != nil {
+            log.Fatal("could not start CPU profile: ", err)
+        }
+    }
 }
 
 func main() {
@@ -87,6 +102,18 @@ You need to either supply a filename or pipe to hesabu
 		}
 	}
 
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			log.Fatal("could not create memory profile: ", err)
+		}
+		runtime.GC() // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal("could not write memory profile: ", err)
+		}
+		f.Close()
+	}
+	pprof.StopCPUProfile()
 }
 
 func logErrors(errors []hesabu.EvalError) {
