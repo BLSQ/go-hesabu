@@ -15,8 +15,11 @@ type ParserTest struct {
 	Solution             interface{}
 }
 
+// "c": "sum(eval_array('a', e, 'b', (f,0), 'a + b'))"
 func TestEvalArrayFunction(t *testing.T) {
-	leave_me_alones := []string{"sum(eval_array('a', (1,2,3), 'b', (3,4,5), 'a + b'))"}
+	leave_me_alones := []string{"sum(eval_array('a', (1,2,5), 'b', (3,4,5), 'a + b'))",
+		"sum(eval_array('quantity_is_null', (0,1,0,1,0,1), 'stock_is_null', (1,1,0,0,0,1), 'if(quantity_is_null + stock_is_null == 2, 1, 0)'))",
+	}
 	var parserTests []ParserTest
 	for _, leave_me_alone := range leave_me_alones {
 		parserTests = append(parserTests, ParserTest{
