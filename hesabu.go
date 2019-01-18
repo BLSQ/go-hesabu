@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"runtime"
 	"runtime/pprof"
-	"os"
 
 	"github.com/BLSQ/go-hesabu/hesabu"
 )
@@ -41,14 +41,14 @@ func init() {
 
 	if *cpuprofile != "" {
 		fmt.Printf("o hai there")
-        f, err := os.Create(*cpuprofile)
-        if err != nil {
-            log.Fatal("could not create CPU profile: ", err)
-        }
-        if err := pprof.StartCPUProfile(f); err != nil {
-            log.Fatal("could not start CPU profile: ", err)
-        }
-    }
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+	}
 }
 
 func main() {

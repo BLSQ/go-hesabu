@@ -8,38 +8,38 @@ import (
 
 	"github.com/Knetic/govaluate"
 )
-var	functions = map[string]govaluate.ExpressionFunction{
-		"strlen":      strlen,
-		"if":          ifFunction,
-		"IF":          ifFunction,
-		"If":          ifFunction,
-		"max":         maxFunction,
-		"MAX":         maxFunction,
-		"Max":         maxFunction,
-		"min":         minFunction,
-		"MIN":         minFunction,
-		"Min":         minFunction,
-		"safe_div":    safeDivFuntion,
-		"SAFE_DIV":    safeDivFuntion,
-		"Safe_div":    safeDivFuntion,
-		"sum":         sumFunction,
-		"SUM":         sumFunction,
-		"Sum":         sumFunction,
-		"avg":         averageFunction,
-		"AVG":         averageFunction,
-		"ABS":         absFunction,
-		"abs":         absFunction,
-		"access":      accessFunction,
-		"ACCESS":      accessFunction,
-		"score_table": scoreTableFunction,
-		"score_Table": scoreTableFunction,
-		"SCORE_TABLE": scoreTableFunction,
-		"round":       roundFunction,
-		"ROUND":       roundFunction,
-		"randbetween": randbetweenFunction,
-		"RANDBETWEEN": randbetweenFunction,
-	}
 
+var functions = map[string]govaluate.ExpressionFunction{
+	"strlen":      strlen,
+	"if":          ifFunction,
+	"IF":          ifFunction,
+	"If":          ifFunction,
+	"max":         maxFunction,
+	"MAX":         maxFunction,
+	"Max":         maxFunction,
+	"min":         minFunction,
+	"MIN":         minFunction,
+	"Min":         minFunction,
+	"safe_div":    safeDivFuntion,
+	"SAFE_DIV":    safeDivFuntion,
+	"Safe_div":    safeDivFuntion,
+	"sum":         sumFunction,
+	"SUM":         sumFunction,
+	"Sum":         sumFunction,
+	"avg":         averageFunction,
+	"AVG":         averageFunction,
+	"ABS":         absFunction,
+	"abs":         absFunction,
+	"access":      accessFunction,
+	"ACCESS":      accessFunction,
+	"score_table": scoreTableFunction,
+	"score_Table": scoreTableFunction,
+	"SCORE_TABLE": scoreTableFunction,
+	"round":       roundFunction,
+	"ROUND":       roundFunction,
+	"randbetween": randbetweenFunction,
+	"RANDBETWEEN": randbetweenFunction,
+}
 
 func randbetweenFunction(args ...interface{}) (interface{}, error) {
 	min := args[0].(float64)
@@ -153,8 +153,8 @@ func sumFunction(args ...interface{}) (interface{}, error) {
 	return total, nil
 }
 
-func wrap(arg interface{}) ([]interface {}) {
-	arr, ok := arg.([]interface {})
+func wrap(arg interface{}) []interface{} {
+	arr, ok := arg.([]interface{})
 	if !ok {
 		arr = make([]interface{}, 1)
 		arr[0] = arg
@@ -162,7 +162,7 @@ func wrap(arg interface{}) ([]interface {}) {
 	return arr
 }
 
-var evalExps = 	make(map[string]*govaluate.EvaluableExpression)
+var evalExps = make(map[string]*govaluate.EvaluableExpression)
 
 func evalArrayFunction(args ...interface{}) (interface{}, error) {
 	key1 := args[0].(string)
@@ -186,7 +186,7 @@ func evalArrayFunction(args ...interface{}) (interface{}, error) {
 		return nil, err
 	}
 	var results []interface{}
-	for i,item1 := range array1 {
+	for i, item1 := range array1 {
 		item2 := array2[i]
 		parameters := make(map[string]interface{}, 2)
 		parameters[key1] = item1
@@ -250,7 +250,7 @@ func Functions() map[string]govaluate.ExpressionFunction {
 		"ROUND":       roundFunction,
 		"randbetween": randbetweenFunction,
 		"RANDBETWEEN": randbetweenFunction,
-		"eval_array" : evalArrayFunction,
+		"eval_array":  evalArrayFunction,
 	}
 	return functions
 }
