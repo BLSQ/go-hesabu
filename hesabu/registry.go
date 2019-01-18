@@ -2,6 +2,7 @@ package hesabu
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"math/rand"
 
@@ -120,6 +121,18 @@ func sumFunction(args ...interface{}) (interface{}, error) {
 	return total, nil
 }
 
+func evalArrayFunction(args ...interface{}) (interface{}, error) {
+	key1 := args[0]
+	array1 := args[1]
+	key2 := args[3]
+	array2 := args[1]
+	meta_formula := args[4].(string)
+
+	// result := meta_formula
+	log.Printf("key 1 %v with %v\nkey2 %v with %v\nsuch meta: %v", key1, array1, key2, array2, meta_formula)
+	return float64(18), nil
+}
+
 func averageFunction(args ...interface{}) (interface{}, error) {
 	total := float64(0)
 	for _, x := range args {
@@ -166,6 +179,7 @@ func Functions() map[string]govaluate.ExpressionFunction {
 		"ROUND":       roundFunction,
 		"randbetween": randbetweenFunction,
 		"RANDBETWEEN": randbetweenFunction,
+		"eval_array" : evalArrayFunction,
 	}
 	return functions
 }

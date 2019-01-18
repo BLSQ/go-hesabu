@@ -15,6 +15,20 @@ type ParserTest struct {
 	Solution             interface{}
 }
 
+func TestEvalArrayFunction(t *testing.T) {
+	leave_me_alones := []string{"sum(eval_array('a', (1,2,3), 'b', (3,4,5), 'a + b'))"}
+	var parserTests []ParserTest
+	for _, leave_me_alone := range leave_me_alones {
+		parserTests = append(parserTests, ParserTest{
+			Name:     leave_me_alone,
+			Input:    leave_me_alone,
+			Expected: leave_me_alone,
+			Solution: 18.0,
+		})
+	}
+	runEvaluationTests(parserTests, t)
+}
+
 func TestCleanerLeavesAlone(t *testing.T) {
 	leave_me_alones := []string{"a<=basic",
 		"a>=basic",
