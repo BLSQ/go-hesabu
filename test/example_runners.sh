@@ -15,7 +15,7 @@ for name in test/bad_*.json
 do
     if bin/hesabucli $name >/dev/null 2>&1
     then
-        $its_all_good=1
+        its_all_good=1
         echo "${name} \033[1;31mFAIL\033[0m"
     else
         echo "${name} \033[1;32mPASS\033[0m"
@@ -28,14 +28,16 @@ do
     then
         echo "${name} \033[1;32mPASS\033[0m"
     else
-        $its_all_good=1
+        its_all_good=1
         echo "${name} \033[1;31mFAIL\033[0m"
     fi
 done
 
 if [ "${its_all_good}" -gt "0" ]
 then
-    echo "Some examples are failing"
+    echo "\n\033[1;31mSome examples are failing\033[0m"
+else
+    echo "\n\033[1;32mIt's all good\033[0m"
 fi
 
 exit $its_all_good
