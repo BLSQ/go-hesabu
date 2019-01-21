@@ -17,6 +17,10 @@ func (e *customFunctionError) Error() string {
 	return fmt.Sprintf("Error for %s-function, %s", e.functionName, e.err)
 }
 
+// Cache for evalArray-evaluations
+var evalExps = make(map[string]*govaluate.EvaluableExpression)
+
+// Functions used by `evalArray`
 var functions = map[string]govaluate.ExpressionFunction{
 	"strlen":      strlen,
 	"if":          ifFunction,
@@ -117,7 +121,10 @@ func ifFunction(args ...interface{}) (interface{}, error) {
 	var result interface{}
 	bool, ok := args[0].(bool)
 	if !ok {
-		return nil, &customFunctionError{"IF", fmt.Sprintf("Expected '%v' to be a boolean expression.", args[0])}
+		return nil, &customFunctionError{
+			functionName: "IF",
+			err:          fmt.Sprintf("Expected '%v' to be a boolean expression.", args[0]),
+		}
 	}
 
 	if bool {
@@ -163,41 +170,57 @@ func sumFunction(args ...interface{}) (interface{}, error) {
 	return total, nil
 }
 
-func wrap(arg interface{}) []interface{} {
-	arr, ok := arg.([]interface{})
-	if !ok {
-		arr = make([]interface{}, 1)
-		arr[0] = arg
-	}
-	return arr
-}
-
-var evalExps = make(map[string]*govaluate.EvaluableExpression)
-
+// A noop function in this context, mainly added for api parity with
+// dentaku, so arrays can be explicilty marked as arrays.
+//
+// ARRAY(1,2,3) => (1,2,3)
 func arrayFunction(args ...interface{}) (interface{}, error) {
 	return args, nil
 }
 
+// `eval_array('a', (1,2,3), 'b', (2,3,4), 'b - a')`
+//
+// 'a'				=> key 1
+// '(1,2,3)'	=> array 1
+// 'b'				=> key 2
+// '(2,3,4)		=> array 2 (needs to be same length as array 1)
+// 'b-a'			=> metaformula
+//
+// Will loop over the arrays and apply the formula to each index, so
+// in this example would result in:
+//
+//       (2-1, 3-2,4-3)
+//       (1,1,1)
 func evalArrayFunction(args ...interface{}) (interface{}, error) {
 	key1 := args[0].(string)
-	array1 := wrap(args[1])
+	array1 := ensureSlice(args[1])
 	key2 := args[2].(string)
-	array2 := wrap(args[3])
+	array2 := ensureSlice(args[3])
+	meta_formula := args[4].(string)
+
 	if len(array1) != len(array2) {
-		return nil, &customFunctionError{"evalArray", fmt.Sprintf("Expected '%v' and '%v' to have same size of values (%v => %d and %v => %d)", key1, key2, array1, len(array1), array2, len(array2))}
+		errorMessage := fmt.Sprintf(
+			"Expected '%v' and '%v' to have same size of values (%d and %d)",
+			key1,
+			key2,
+			len(array1),
+			len(array2))
+		return nil, &customFunctionError{"evalArray", errorMessage}
 	}
 
-	meta_formula := args[4].(string)
 	var expression *govaluate.EvaluableExpression
 	var err error
-	if v, aok := evalExps[meta_formula]; aok {
+	if v, ok := evalExps[meta_formula]; ok {
 		expression = v
 	} else {
 		expression, err = govaluate.NewEvaluableExpressionWithFunctions(meta_formula, functions)
 	}
 
 	if err != nil {
-		return nil, &customFunctionError{"evalArray", fmt.Sprintf("Meta formula: %v", err)}
+		return nil, &customFunctionError{
+			functionName: "evalArray",
+			err:          fmt.Sprintf("Meta formula: %v", err),
+		}
 	}
 	var results []interface{}
 	for i, item1 := range array1 {
@@ -207,12 +230,14 @@ func evalArrayFunction(args ...interface{}) (interface{}, error) {
 		parameters[key2] = item2
 		result, error_eval := expression.Evaluate(parameters)
 		if error_eval != nil {
-			return nil, &customFunctionError{"evalArray", fmt.Sprintf("Inner eval: %v", error_eval)}
+			return nil, &customFunctionError{
+				functionName: "evalArray",
+				err:          fmt.Sprintf("Inner eval: %v", error_eval),
+			}
 		}
 		results = append(results, result)
 	}
 
-	// result := meta_formula
 	return results, nil
 }
 
@@ -227,6 +252,17 @@ func averageFunction(args ...interface{}) (interface{}, error) {
 func strlen(args ...interface{}) (interface{}, error) {
 	length := len(args[0].(string))
 	return (float64)(length), nil
+}
+
+// Ensures that the interface passed is a slice, it's like Array.wrap
+// but in golang.
+func ensureSlice(arg interface{}) []interface{} {
+	arr, ok := arg.([]interface{})
+	if !ok {
+		arr = make([]interface{}, 1)
+		arr[0] = arg
+	}
+	return arr
 }
 
 // Functions return function registry
