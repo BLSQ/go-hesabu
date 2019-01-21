@@ -15,9 +15,9 @@ import (
 )
 
 var (
-	version = "dev"
+	version = "0.0.4"
 	commit  = "none"
-	date    = "unknown"
+	date    = "20190121"
 )
 
 var debugFlag = flag.Bool("d", false, "Extra debug logging")
