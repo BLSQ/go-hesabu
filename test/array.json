@@ -1,0 +1,4 @@
+{
+    "without_array" : "sum(1,2,3)",
+    "with_array" : "sum(array(1,2,3))"
+}
