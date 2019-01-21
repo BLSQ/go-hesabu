@@ -2,12 +2,20 @@ package hesabu
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"math/rand"
 
 	"github.com/Knetic/govaluate"
 )
+
+type customFunctionError struct {
+	functionName string
+	err          string
+}
+
+func (e *customFunctionError) Error() string {
+	return fmt.Sprintf("Error for %s-function, %s", e.functionName, e.err)
+}
 
 var functions = map[string]govaluate.ExpressionFunction{
 	"strlen":      strlen,
@@ -39,6 +47,8 @@ var functions = map[string]govaluate.ExpressionFunction{
 	"ROUND":       roundFunction,
 	"randbetween": randbetweenFunction,
 	"RANDBETWEEN": randbetweenFunction,
+	"array":       arrayFunction,
+	"ARRAY":       arrayFunction,
 }
 
 func randbetweenFunction(args ...interface{}) (interface{}, error) {
@@ -107,7 +117,7 @@ func ifFunction(args ...interface{}) (interface{}, error) {
 	var result interface{}
 	bool, ok := args[0].(bool)
 	if !ok {
-		return nil, fmt.Errorf("Expected '%v' to be a boolean expression.", args[0])
+		return nil, &customFunctionError{"IF", fmt.Sprintf("Expected '%v' to be a boolean expression.", args[0])}
 	}
 
 	if bool {
@@ -164,14 +174,19 @@ func wrap(arg interface{}) []interface{} {
 
 var evalExps = make(map[string]*govaluate.EvaluableExpression)
 
+func arrayFunction(args ...interface{}) (interface{}, error) {
+	return args, nil
+}
+
 func evalArrayFunction(args ...interface{}) (interface{}, error) {
 	key1 := args[0].(string)
 	array1 := wrap(args[1])
 	key2 := args[2].(string)
 	array2 := wrap(args[3])
 	if len(array1) != len(array2) {
-		return nil, fmt.Errorf("Expected '%v' and '%v' to have same size of values (%v => %d and %v => %d)", key1, key2, array1, len(array1), array2, len(array2))
+		return nil, &customFunctionError{"evalArray", fmt.Sprintf("Expected '%v' and '%v' to have same size of values (%v => %d and %v => %d)", key1, key2, array1, len(array1), array2, len(array2))}
 	}
+
 	meta_formula := args[4].(string)
 	var expression *govaluate.EvaluableExpression
 	var err error
@@ -181,9 +196,8 @@ func evalArrayFunction(args ...interface{}) (interface{}, error) {
 		expression, err = govaluate.NewEvaluableExpressionWithFunctions(meta_formula, functions)
 	}
 
-	log.Printf("Expression error %v", err)
 	if err != nil {
-		return nil, err
+		return nil, &customFunctionError{"evalArray", fmt.Sprintf("Meta formula: %v", err)}
 	}
 	var results []interface{}
 	for i, item1 := range array1 {
@@ -192,15 +206,13 @@ func evalArrayFunction(args ...interface{}) (interface{}, error) {
 		parameters[key1] = item1
 		parameters[key2] = item2
 		result, error_eval := expression.Evaluate(parameters)
-		log.Printf("result %v, error_eval %v", result, error_eval)
 		if error_eval != nil {
-			return nil, error_eval
+			return nil, &customFunctionError{"evalArray", fmt.Sprintf("Inner eval: %v", error_eval)}
 		}
 		results = append(results, result)
 	}
 
 	// result := meta_formula
-	log.Printf("key 1 %v with %v\nkey2 %v with %v\nsuch meta: %v\nexpression%v", key1, array1, key2, array2, meta_formula, expression)
 	return results, nil
 }
 
@@ -251,6 +263,8 @@ func Functions() map[string]govaluate.ExpressionFunction {
 		"randbetween": randbetweenFunction,
 		"RANDBETWEEN": randbetweenFunction,
 		"eval_array":  evalArrayFunction,
+		"array":       arrayFunction,
+		"ARRAY":       arrayFunction,
 	}
 	return functions
 }

@@ -56,8 +56,8 @@ func TestGeneric(t *testing.T) {
 func TestIfFunctionWithIncorrectBool(t *testing.T) {
 	inputData := []interface{}{1, 2, 3}
 	_, err := Functions()["IF"](inputData...)
-	if err == nil {
-		t.Logf("1 is not a bool, this should have failed")
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
 		t.Fail()
 	}
 }

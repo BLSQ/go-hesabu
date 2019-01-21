@@ -1,5 +1,8 @@
 {
     "e": "1",
     "f": "5",
-    "shouldbe5": "sum(eval_array('a', e, 'b', f, 'a * b'))",
-    "shouldbe2": "sum(eval_array('quantity_is_null', (0,1,0,1,0,1), 'stock_is_null', (1,1,0,0,0,1), 'if(quantity_is_null + stock_is_null == 2, 1, 0)'))",
+    "should_be_5": "sum(eval_array('a', e, 'b', f, 'a * b'))",
+    "should_also_be_5": "sum(eval_array('a', array(e), 'b', array(f), 'a * b'))",
+    "should_be_0": "sum(eval_array('a', array(e,f), 'b', array(1,5), 'b - a'))",
+    "should_be_2": "sum(eval_array('quantity_is_null', array(0,1,0,1,0,1), 'stock_is_null', array(1,1,0,0,0,1), 'if(quantity_is_null + stock_is_null == 2, 1, 0)'))"
+}

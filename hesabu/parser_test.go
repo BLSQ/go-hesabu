@@ -8,28 +8,55 @@ import (
 )
 
 type ParserTest struct {
-	Name                 string
-	Input                string
-	Expected             string
-	ExpectedErrorMessage string
-	Solution             interface{}
+	Name               string
+	Input              string
+	Expected           string
+	ParserErrorMessage string
+	Solution           interface{}
+	SolutionError      string
 }
 
-// "c": "sum(eval_array('a', e, 'b', (f,0), 'a + b'))"
+func TestArrayFunction(t *testing.T) {
+	testCases := []ParserTest{
+		{
+			Name:     "array in sum",
+			Input:    "sum(array(1,2,3))",
+			Solution: 6.0,
+		},
+		{
+			Name:     "ARRAY in avg",
+			Input:    "avg(ARRAY(1,2,3,4,5))",
+			Solution: 3.0,
+		},
+	}
+	runEvaluationTests(testCases, t)
+}
+
 func TestEvalArrayFunction(t *testing.T) {
-	leave_me_alones := []string{"sum(eval_array('a', (1,2,5), 'b', (3,4,5), 'a + b'))",
-		"sum(eval_array('quantity_is_null', (0,1,0,1,0,1), 'stock_is_null', (1,1,0,0,0,1), 'if(quantity_is_null + stock_is_null == 2, 1, 0)'))",
+	testCases := []ParserTest{
+		{
+			Name:     "Simple case",
+			Input:    "sum(eval_array('a', (1,2,5), 'b', (3,4,5), 'a + b'))",
+			Solution: 20.0,
+		},
+		{
+			Name:     "Simple case with use of array function",
+			Input:    "sum(eval_array('a', array(1,2,5), 'b', array(3,4,5), 'a + b'))",
+			Solution: 20.0,
+		},
+		{
+			Name:     "More complex",
+			Input:    "sum(eval_array('quantity_is_null', (0,1,0,1,0,1), 'stock_is_null', (1,1,0,0,0,1), 'if(quantity_is_null + stock_is_null == 2, 1, 0)'))",
+			Solution: 2.0,
+		},
+		{
+			Name:          "Malformed formulas return an error",
+			Input:         "sum(eval_array('a', array(1), 'b', array(1,2), 'a + b'))",
+			SolutionError: "customErrorFunction",
+			Solution:      9000,
+		},
 	}
-	var parserTests []ParserTest
-	for _, leave_me_alone := range leave_me_alones {
-		parserTests = append(parserTests, ParserTest{
-			Name:     leave_me_alone,
-			Input:    leave_me_alone,
-			Expected: leave_me_alone,
-			Solution: 18.0,
-		})
-	}
-	runEvaluationTests(parserTests, t)
+	runEvaluationTests(testCases, t)
 }
 
 func TestCleanerLeavesAlone(t *testing.T) {
@@ -132,14 +159,14 @@ func TestCleaner(t *testing.T) {
 			Expected: "operator==1",
 		},
 		{
-			Name:                 "Malformed formulas return an error",
-			Input:                "=operator=1",
-			ExpectedErrorMessage: "Invalid token: '='",
+			Name:               "Malformed formulas return an error",
+			Input:              "=operator=1",
+			ParserErrorMessage: "Invalid token: '='",
 		},
 		{
-			Name:                 "Malformed formulas return an error",
-			Input:                "operator=1=",
-			ExpectedErrorMessage: "Invalid token: '='",
+			Name:               "Malformed formulas return an error",
+			Input:              "operator=1=",
+			ParserErrorMessage: "Invalid token: '='",
 		},
 	}
 	runEvaluationTests(parserTests, t)
@@ -157,18 +184,9 @@ func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
 			"testing": parserTest.Input,
 		}
 		parsedEquations := Parse(equations, functions)
+
 		if parserTest.Expected != "" {
-			solution, err := parsedEquations.Solve()
-			if err != nil {
-				t.Logf("err not nil : %s", err)
-			} else {
-				if parserTest.Solution != nil && parserTest.Solution != solution["testing"] {
-					t.Logf("Test '%s' '%s' vs '%s'", parserTest.Name, parserTest.Solution, solution["testing"])
-					t.Fail()
-					continue
-				}
-			}
-			if len(parsedEquations.Errors) < 0 {
+			if len(parsedEquations.Errors) > 0 {
 				t.Logf("%s - had an error but should not have had", parserTest.Name)
 				t.Fail()
 				continue
@@ -181,15 +199,33 @@ func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
 			}
 		}
 
-		if parserTest.ExpectedErrorMessage != "" {
+		if parserTest.Solution != nil {
+			solution, err := parsedEquations.Solve()
+			if err != nil {
+				if parserTest.SolutionError != "" {
+					return
+				}
+				t.Logf("Has an error while test has not set a Solution Error : %s", err)
+				t.Fail()
+				continue
+			}
+
+			if parserTest.Solution != solution["testing"] {
+				t.Logf("Test '%s' '%s' vs '%s'", parserTest.Name, parserTest.Solution, solution["testing"])
+				t.Fail()
+				continue
+			}
+		}
+
+		if parserTest.ParserErrorMessage != "" {
 			errors := parsedEquations.Errors
 			if len(errors) < 1 {
-				t.Logf("%s - Expected an error with %s but none was returned", parserTest.Name, parserTest.ExpectedErrorMessage)
+				t.Logf("%s - Expected an error with %s but none was returned", parserTest.Name, parserTest.ParserErrorMessage)
 				t.Fail()
 				continue
 			}
 			was := errors[0].Message
-			if parserTest.ExpectedErrorMessage != was {
+			if parserTest.ParserErrorMessage != was {
 				t.Logf("Test '%s' '%s' vs '%s'", parserTest.Name, parserTest.Expected, was)
 				t.Fail()
 				continue
