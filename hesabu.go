@@ -40,13 +40,7 @@ func init() {
 	}
 
 	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal("could not create CPU profile: ", err)
-		}
-		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal("could not start CPU profile: ", err)
-		}
+		startProfilingCPU(*cpuprofile)
 	}
 }
 
@@ -101,18 +95,11 @@ You need to either supply a filename or pipe to hesabu
 		}
 	}
 
+	stopProfilingCPU()
 	if *memprofile != "" {
-		f, err := os.Create(*memprofile)
-		if err != nil {
-			log.Fatal("could not create memory profile: ", err)
-		}
-		runtime.GC() // get up-to-date statistics
-		if err := pprof.WriteHeapProfile(f); err != nil {
-			log.Fatal("could not write memory profile: ", err)
-		}
-		f.Close()
+		startProfilingMemory(*memprofile)
 	}
-	pprof.StopCPUProfile()
+
 }
 
 func logErrors(errors []hesabu.EvalError) {
@@ -164,4 +151,30 @@ func getEquations(raw []byte) (map[string]string, error) {
 	}
 	log.Printf("equations loaded: %d ", len(results))
 	return results, nil
+}
+
+func startProfilingCPU(fileName string) {
+	f, err := os.Create(fileName)
+	if err != nil {
+		log.Fatal("could not create CPU profile: ", err)
+	}
+	if err := pprof.StartCPUProfile(f); err != nil {
+		log.Fatal("could not start CPU profile: ", err)
+	}
+}
+
+func stopProfilingCPU() {
+	pprof.StopCPUProfile()
+}
+
+func startProfilingMemory(fileName string) {
+	f, err := os.Create(fileName)
+	if err != nil {
+		log.Fatal("could not create memory profile: ", err)
+	}
+	runtime.GC() // get up-to-date statistics
+	if err := pprof.WriteHeapProfile(f); err != nil {
+		log.Fatal("could not write memory profile: ", err)
+	}
+	defer f.Close()
 }
