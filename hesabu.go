@@ -40,7 +40,6 @@ func init() {
 	}
 
 	if *cpuprofile != "" {
-		fmt.Printf("o hai there")
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
 			log.Fatal("could not create CPU profile: ", err)

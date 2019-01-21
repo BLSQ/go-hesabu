@@ -80,6 +80,25 @@ script/build
 
 Which will generate both a Mac version and a Linux version in the bin folder.
 
+## Profiling
+
+You can run the binary with two additional flags, to enable cpu and memory profiling.
+
+`bin/hesabucli -cpuprofile cpu.prof -memprofile mem.prof test/large_set_of_equations.json`
+
+Now you should have both a cpu.prof and a mem.prof in your directory.
+
+If you now run:
+
+      go tool pprof cpu.prof
+
+You'll be dropped into an interactive profile viewer.
+
+Even more interesting is that you can open an interactive version in you browser with the following:
+
+      pprof -http=localhost:1234 bin/hesabucli cpu.prof
+>>>>>>> d6027d5... Document profiling
+
 ## releasing
 
 have goreleaser https://goreleaser.com/install/
