@@ -38,6 +38,11 @@ func TestGeneric(t *testing.T) {
 
 		{"abs", []interface{}{1.0}, 1.0},
 		{"abs", []interface{}{-1.0}, 1.0},
+
+		{"access", []interface{}{1.0, 2.0, 3.0, 1.0}, 2.0},
+		{"access", []interface{}{1.0, 2.0, 3.0, 2.0}, 3.0},
+
+		{"strlen", []interface{}{"1234567"}, 7.0},
 	}
 
 	for _, table := range tables {
@@ -56,8 +61,8 @@ func TestGeneric(t *testing.T) {
 func TestIfFunctionWithIncorrectBool(t *testing.T) {
 	inputData := []interface{}{1, 2, 3}
 	_, err := Functions()["IF"](inputData...)
-	if err == nil {
-		t.Logf("1 is not a bool, this should have failed")
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
 		t.Fail()
 	}
 }

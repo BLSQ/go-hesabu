@@ -8,18 +8,22 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
+	"runtime/pprof"
 
 	"github.com/BLSQ/go-hesabu/hesabu"
 )
 
 var (
-	version = "dev"
+	version = "0.0.4"
 	commit  = "none"
-	date    = "unknown"
+	date    = "20190121"
 )
 
 var debugFlag = flag.Bool("d", false, "Extra debug logging")
 var versionFlag = flag.Bool("v", false, "Prints version")
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
+var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
 func init() {
 	flag.Parse()
@@ -33,6 +37,10 @@ func init() {
 		log.SetOutput(os.Stderr)
 	} else {
 		log.SetOutput(ioutil.Discard)
+	}
+
+	if *cpuprofile != "" {
+		startProfilingCPU(*cpuprofile)
 	}
 }
 
@@ -87,6 +95,11 @@ You need to either supply a filename or pipe to hesabu
 		}
 	}
 
+	stopProfilingCPU()
+	if *memprofile != "" {
+		startProfilingMemory(*memprofile)
+	}
+
 }
 
 func logErrors(errors []hesabu.EvalError) {
@@ -138,4 +151,30 @@ func getEquations(raw []byte) (map[string]string, error) {
 	}
 	log.Printf("equations loaded: %d ", len(results))
 	return results, nil
+}
+
+func startProfilingCPU(fileName string) {
+	f, err := os.Create(fileName)
+	if err != nil {
+		log.Fatal("could not create CPU profile: ", err)
+	}
+	if err := pprof.StartCPUProfile(f); err != nil {
+		log.Fatal("could not start CPU profile: ", err)
+	}
+}
+
+func stopProfilingCPU() {
+	pprof.StopCPUProfile()
+}
+
+func startProfilingMemory(fileName string) {
+	f, err := os.Create(fileName)
+	if err != nil {
+		log.Fatal("could not create memory profile: ", err)
+	}
+	runtime.GC() // get up-to-date statistics
+	if err := pprof.WriteHeapProfile(f); err != nil {
+		log.Fatal("could not write memory profile: ", err)
+	}
+	defer f.Close()
 }
