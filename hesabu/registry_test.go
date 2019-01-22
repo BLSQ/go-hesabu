@@ -38,6 +38,11 @@ func TestGeneric(t *testing.T) {
 
 		{"abs", []interface{}{1.0}, 1.0},
 		{"abs", []interface{}{-1.0}, 1.0},
+
+		{"access", []interface{}{1.0, 2.0, 3.0, 1.0}, 2.0},
+		{"access", []interface{}{1.0, 2.0, 3.0, 2.0}, 3.0},
+
+		{"strlen", []interface{}{"1234567"}, 7.0},
 	}
 
 	for _, table := range tables {
