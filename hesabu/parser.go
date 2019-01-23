@@ -70,31 +70,31 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 	}
 
 	for _, key := range topsort {
+		expression, ok := parsedEquations.Equations[key]
+		if !ok {
+			// Should we already bail here?
+			// The solve won't work because we're missing a parameter.
+			log.Printf("[%s] was never defined", key)
+			continue
+		}
 
-		result, err := parsedEquations.Equations[key].Evaluate(solutions)
+		result, err := expression.Evaluate(solutions)
+
 		if err != nil {
 			return parsedEquations.newSingleError(key, err.Error())
 		}
 
-		v, ok := result.(float64)
-		if !ok {
-			log.Printf("%v is not float64, %v (%s)", result, key, parsedEquations.RawEquations[key])
-		} else {
-			log.Printf("%s = %v (%s)", key, v, parsedEquations.RawEquations[key])
+		switch v := result.(type) {
+		case float64:
 			if math.IsInf(v, 0) {
 				return parsedEquations.newSingleError(key, "Divide by zero")
 			} else {
 				solutions[key] = v
 			}
-		}
-
-		vBool, okBool := result.(bool)
-		if okBool {
-			solutions[key] = vBool
-		}
-		vString, okString := result.(string)
-		if okString {
-			solutions[key] = vString
+		case bool, string, []int, []float64, []interface{}:
+			solutions[key] = v
+		default:
+			log.Printf("[%s] -> %v is of an unexpected type (type %T), used in %v", key, v, v, parsedEquations.Equations[key])
 		}
 	}
 	return solutions, nil

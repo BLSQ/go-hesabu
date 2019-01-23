@@ -67,6 +67,15 @@ func TestIfFunctionWithIncorrectBool(t *testing.T) {
 	}
 }
 
+func TestSumFunctionWithIncorrectValues(t *testing.T) {
+	inputData := []interface{}{"a", "b", "c"}
+	_, err := Functions()["SUM"](inputData...)
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
+		t.Fail()
+	}
+}
+
 func TestRandBetweenFunction(t *testing.T) {
 	inputData := []interface{}{1.0, 10.0}
 	value, err := Functions()["randbetween"](inputData...)
