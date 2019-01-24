@@ -285,6 +285,19 @@ func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
 	}
 }
 
+func TestUnboundVariables(t *testing.T) {
+	functions := Functions()
+	equations := map[string]string{
+		"result": "a + b + c",
+	}
+	parsedEquations := Parse(equations, functions)
+	_, err := parsedEquations.Solve()
+	if _, ok := err.(*EvalError); !ok {
+		t.Logf("Expected an eval error because a, b and c were never defined")
+		t.Fail()
+	}
+}
+
 func BenchmarkParse(b *testing.B) {
 	functions := Functions()
 	raw, err := ioutil.ReadFile("../test/very_large_set_of_equations.json")

@@ -67,15 +67,17 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 	solutions := make(map[string]interface{}, len(parsedEquations.RawEquations))
 	if len(topsort) == 0 {
 		evalError := EvalError{Message: "cycle between equations", Source: "general", Expression: "general"}
-		return make(map[string]interface{}), &CustomError{EvalError: evalError}
+		return nil, &CustomError{EvalError: evalError}
 	}
 
 	for _, key := range topsort {
 		expression, ok := parsedEquations.Equations[key]
 		if !ok {
-			// Should we already bail here?
-			// The solve won't work because we're missing a parameter.
-			log.Printf("[%s] was never defined", key)
+			return nil, &EvalError{
+				Message:    fmt.Sprintf("%s was never defined", key),
+				Source:     key,
+				Expression: "",
+			}
 			continue
 		}
 
@@ -104,7 +106,7 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 func (parsedEquations ParsedEquations) newSingleError(key string, message string) (map[string]interface{}, error) {
 	equation := parsedEquations.RawEquations[key]
 	evalError := EvalError{Message: message, Source: key, Expression: equation}
-	return make(map[string]interface{}), &CustomError{EvalError: evalError}
+	return nil, &CustomError{EvalError: evalError}
 }
 
 func isNumeric(s string) bool {
