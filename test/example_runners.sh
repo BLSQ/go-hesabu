@@ -11,9 +11,14 @@ set -e
 
 its_all_good=0
 
+cli=bin/hesabucli
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    cli=bin/hesabucli-mac
+fi
+
 for name in test/bad_*.json
 do
-    if bin/hesabucli $name >/dev/null 2>&1
+    if $cli $name >/dev/null 2>&1
     then
         its_all_good=1
         echo "${name} \033[1;31mFAIL\033[0m"
@@ -24,7 +29,7 @@ done
 
 for name in $(ls -1 test/*.json | grep -v 'bad_')
 do
-    if bin/hesabucli $name >/dev/null 2>&1
+    if $cli $name >/dev/null 2>&1
     then
         echo "${name} \033[1;32mPASS\033[0m"
     else
