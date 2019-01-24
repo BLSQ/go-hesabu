@@ -19,3 +19,6 @@ script/test
 
 echo "Running examples"
 sh test/example_runners.sh
+
+echo "Running benchmarks"
+script/bench

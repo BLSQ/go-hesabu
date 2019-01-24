@@ -1,0 +1,15 @@
+#! /bin/sh
+#
+# Stop on error and output every command before executing it
+set -e
+
+[ -z "$DEBUG" ] || set -x
+
+cd "$(dirname "$0")/.."
+
+script/bootstrap
+script/build
+
+echo " -> Benchmarking"
+echo "    (+- 8s on a MacBook, +- 10s on Travis)"
+go test -bench=. ./...

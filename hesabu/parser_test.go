@@ -285,12 +285,9 @@ func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
 	}
 }
 
-// Without Clean						: BenchmarkParse-4   	      10	 165449475 ns/op
-// With replaceSingleEqual  : BenchmarkParse-4   	      10	 188343765 ns/op
-// With regex								: BenchmarkParse-4   	       5	 318208619 ns/op
 func BenchmarkParse(b *testing.B) {
-	functions := map[string]govaluate.ExpressionFunction{}
-	raw, err := ioutil.ReadFile("../test/large_set_of_equations.json")
+	functions := Functions()
+	raw, err := ioutil.ReadFile("../test/very_large_set_of_equations.json")
 	if err != nil {
 		panic("file not read")
 	}
@@ -300,8 +297,28 @@ func BenchmarkParse(b *testing.B) {
 		panic("Could not read JSON")
 	}
 	b.ResetTimer()
-	// run the Fib function b.N times
 	for n := 0; n < b.N; n++ {
 		Parse(equations, functions)
+	}
+}
+
+func BenchmarkSolve(b *testing.B) {
+	functions := Functions()
+	raw, err := ioutil.ReadFile("../test/very_large_set_of_equations.json")
+	if err != nil {
+		panic("file not read")
+	}
+	var equations map[string]string
+	err = json.Unmarshal(raw, &equations)
+	if err != nil {
+		panic("Could not read JSON")
+	}
+	parsedEquations := Parse(equations, functions)
+	if len(parsedEquations.Errors) > 0 {
+		panic("Error while parsing")
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		parsedEquations.Solve()
 	}
 }
