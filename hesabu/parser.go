@@ -73,10 +73,12 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 	for _, key := range topsort {
 		expression, ok := parsedEquations.Equations[key]
 		if !ok {
-			return nil, &EvalError{
-				Message:    fmt.Sprintf("%s was never defined", key),
-				Source:     key,
-				Expression: "",
+			return nil, &CustomError{
+				EvalError: EvalError{
+					Message:    fmt.Sprintf("%s was never defined", key),
+					Source:     key,
+					Expression: "",
+				},
 			}
 			continue
 		}

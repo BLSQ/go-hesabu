@@ -292,7 +292,7 @@ func TestUnboundVariables(t *testing.T) {
 	}
 	parsedEquations := Parse(equations, functions)
 	_, err := parsedEquations.Solve()
-	if _, ok := err.(*EvalError); !ok {
+	if _, ok := err.(*CustomError); !ok {
 		t.Logf("Expected an eval error because a, b and c were never defined")
 		t.Fail()
 	}

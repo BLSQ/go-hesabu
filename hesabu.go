@@ -74,33 +74,25 @@ You need to either supply a filename or pipe to hesabu
 	if len(parsedEquations.Errors) > 0 {
 		logErrors(parsedEquations.Errors)
 		os.Exit(1)
-	} else {
-		solutions, err := parsedEquations.Solve()
-		if err != nil {
-			var evalErrors []hesabu.EvalError
-			var hesabuerr hesabu.EvalError
+	}
 
-			ok, err2 := err.(*hesabu.CustomError)
-			if !err2 {
-				panic("ddd")
-			}
-			if ok != nil {
-				hesabuerr = ok.EvalError
-			}
-
-			evalErrors = append(evalErrors, hesabuerr)
-			logErrors(evalErrors)
+	solutions, err := parsedEquations.Solve()
+	if err != nil {
+		if customError, ok := err.(*hesabu.CustomError); ok {
+			evalError := customError.EvalError
+			logErrors([]hesabu.EvalError{evalError})
 			os.Exit(1)
 		} else {
-			logSolution(solutions)
+			panic("Only expected a custom error")
 		}
 	}
+
+	logSolution(solutions)
 
 	stopProfilingCPU()
 	if *memprofile != "" {
 		startProfilingMemory(*memprofile)
 	}
-
 }
 
 func logErrors(errors []hesabu.EvalError) {
