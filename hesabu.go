@@ -24,6 +24,7 @@ var debugFlag = flag.Bool("d", false, "Extra debug logging")
 var versionFlag = flag.Bool("v", false, "Prints version")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+var ShouldLog = false
 
 func init() {
 	flag.Parse()
@@ -34,9 +35,9 @@ func init() {
 	}
 
 	if os.Getenv("HESABU_DEBUG") == "true" || *debugFlag {
+		ShouldLog = true
+		hesabu.ShouldLog = ShouldLog
 		log.SetOutput(os.Stderr)
-	} else {
-		log.SetOutput(ioutil.Discard)
 	}
 
 	if *cpuprofile != "" {
@@ -142,14 +143,18 @@ func getInput(flag_arguments []string) ([]byte, error) {
 }
 
 func getEquations(raw []byte) (map[string]string, error) {
-	log.Printf("equations to parse %s", string(raw))
 	var results map[string]string
 	err := json.Unmarshal(raw, &results)
 	if err != nil {
-		log.Printf("equations not loaded %v ", err)
+		if ShouldLog {
+			log.Printf("equations to parse %s", string(raw))
+			log.Printf("equations not loaded %v ", err)
+		}
 		return nil, err
 	}
-	log.Printf("equations loaded: %d ", len(results))
+	if ShouldLog {
+		log.Printf("equations loaded: %d ", len(results))
+	}
 	return results, nil
 }
 

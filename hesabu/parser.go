@@ -28,6 +28,8 @@ func (e *CustomError) Error() string {
 	return e.EvalError.Error()
 }
 
+var ShouldLog = false
+
 // Eval or parsing errors
 type EvalError struct {
 	Source     string `json:"source"`
@@ -52,7 +54,6 @@ func Parse(rawEquations map[string]string, functions map[string]govaluate.Expres
 			errorsCollector = append(errorsCollector, EvalError{Source: key, Message: err.Error(), Expression: exp})
 		} else {
 			equations[key] = *expression
-			log.Printf("vars  %v", expression.Vars())
 			equationDependencies[key] = expression.Vars()
 		}
 	}
