@@ -2,7 +2,6 @@ package hesabu
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"strconv"
 	"strings"
@@ -73,35 +72,28 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 	for _, key := range topsort {
 		expression, ok := parsedEquations.Equations[key]
 		if !ok {
-			return nil, &CustomError{
-				EvalError: EvalError{
-					Message:    fmt.Sprintf("%s was never defined", key),
-					Source:     key,
-					Expression: "",
-				},
-			}
+			// Key is missing an expression, we allow it to go on because
+			// Evaluate will produce a better error message when it needs
+			// this key.
 			continue
 		}
-
 		result, err := expression.Evaluate(solutions)
 
 		if err != nil {
 			return parsedEquations.newSingleError(key, err.Error())
 		}
 
-		switch v := result.(type) {
-		case float64:
+		if v, ok := result.(float64); ok {
 			if math.IsInf(v, 0) {
 				return parsedEquations.newSingleError(key, "Divide by zero")
 			} else {
 				solutions[key] = v
 			}
-		case bool, string, []int, []float64, []interface{}:
-			solutions[key] = v
-		default:
-			log.Printf("[%s] -> %v is of an unexpected type (type %T), used in %v", key, v, v, parsedEquations.Equations[key])
+		} else {
+			solutions[key] = result
 		}
 	}
+
 	return solutions, nil
 }
 
