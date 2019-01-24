@@ -2,7 +2,6 @@ package hesabu
 
 import (
 	"encoding/json"
-	"github.com/Knetic/govaluate"
 	"io/ioutil"
 	"testing"
 )
@@ -32,6 +31,49 @@ func TestArrayFunction(t *testing.T) {
 	runEvaluationTests(testCases, t)
 }
 
+func TestVariableAsArray(t *testing.T) {
+	functions := Functions() //map[string]govaluate.ExpressionFunction{}
+	equations := map[string]string{
+		"a":      "array(1,2,-3,4,5)",
+		"sum":    "sum(a)",
+		"max":    "max(a)",
+		"min":    "min(a)",
+		"avg":    "avg(a)",
+		"access": "access(a,1)",
+	}
+	parsedEquations := Parse(equations, functions)
+	if len(parsedEquations.Errors) > 0 {
+		t.Logf("Did not expect any errors while parsing: %v", parsedEquations.Errors)
+		t.Fail()
+	}
+
+	solution, err := parsedEquations.Solve()
+	if err != nil {
+		t.Logf("Did not expect an error: %s", err)
+		t.Fail()
+	}
+	if solution["sum"] != (1 + 2 + -3.0 + 4.0 + 5.0) {
+		t.Logf("Solution does not match our sum: %f", solution["sum"])
+		t.Fail()
+	}
+	if solution["max"] != 5.0 {
+		t.Logf("Solution does not match our max: %f", solution["max"])
+		t.Fail()
+	}
+	if solution["min"] != -3.0 {
+		t.Logf("Solution does not match our min: %f", solution["min"])
+		t.Fail()
+	}
+	if solution["avg"] != 1.8 {
+		t.Logf("Solution does not match our avg: %f", solution["avg"])
+		t.Fail()
+	}
+	if solution["access"] != 2.0 {
+		t.Logf("Solution does not match our access: %f", solution["access"])
+		t.Fail()
+	}
+}
+
 func TestEvalArrayFunction(t *testing.T) {
 	testCases := []ParserTest{
 		{
@@ -48,6 +90,11 @@ func TestEvalArrayFunction(t *testing.T) {
 			Name:     "More complex",
 			Input:    "sum(eval_array('quantity_is_null', (0,1,0,1,0,1), 'stock_is_null', (1,1,0,0,0,1), 'if(quantity_is_null + stock_is_null == 2, 1, 0)'))",
 			Solution: 2.0,
+		},
+		{
+			Name:     "Can handle negative numbers",
+			Input:    "sum(eval_array('a', (1,-2,5), 'b', (3,4,-5), 'a - b'))",
+			Solution: (1.0 - 3.0 + -2.0 - 4.0 + 5.0 - -5.0),
 		},
 		{
 			Name:          "Malformed formulas return an error",
@@ -181,6 +228,9 @@ func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
 			"basic":   "4",
 			"a":       "1",
 			"b":       "2",
+			"c":       "4",
+			"d":       "5",
+			"e":       "6",
 			"testing": parserTest.Input,
 		}
 		parsedEquations := Parse(equations, functions)
@@ -235,12 +285,22 @@ func runEvaluationTests(parserTests []ParserTest, t *testing.T) {
 	}
 }
 
-// Without Clean						: BenchmarkParse-4   	      10	 165449475 ns/op
-// With replaceSingleEqual  : BenchmarkParse-4   	      10	 188343765 ns/op
-// With regex								: BenchmarkParse-4   	       5	 318208619 ns/op
+func TestUnboundVariables(t *testing.T) {
+	functions := Functions()
+	equations := map[string]string{
+		"result": "a + b + c",
+	}
+	parsedEquations := Parse(equations, functions)
+	_, err := parsedEquations.Solve()
+	if _, ok := err.(*CustomError); !ok {
+		t.Logf("Expected an eval error because a, b and c were never defined")
+		t.Fail()
+	}
+}
+
 func BenchmarkParse(b *testing.B) {
-	functions := map[string]govaluate.ExpressionFunction{}
-	raw, err := ioutil.ReadFile("../test/large_set_of_equations.json")
+	functions := Functions()
+	raw, err := ioutil.ReadFile("../test/very_large_set_of_equations.json")
 	if err != nil {
 		panic("file not read")
 	}
@@ -250,8 +310,28 @@ func BenchmarkParse(b *testing.B) {
 		panic("Could not read JSON")
 	}
 	b.ResetTimer()
-	// run the Fib function b.N times
 	for n := 0; n < b.N; n++ {
 		Parse(equations, functions)
+	}
+}
+
+func BenchmarkSolve(b *testing.B) {
+	functions := Functions()
+	raw, err := ioutil.ReadFile("../test/very_large_set_of_equations.json")
+	if err != nil {
+		panic("file not read")
+	}
+	var equations map[string]string
+	err = json.Unmarshal(raw, &equations)
+	if err != nil {
+		panic("Could not read JSON")
+	}
+	parsedEquations := Parse(equations, functions)
+	if len(parsedEquations.Errors) > 0 {
+		panic("Error while parsing")
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		parsedEquations.Solve()
 	}
 }

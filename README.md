@@ -97,7 +97,6 @@ You'll be dropped into an interactive profile viewer.
 Even more interesting is that you can open an interactive version in you browser with the following:
 
       pprof -http=localhost:1234 bin/hesabucli cpu.prof
->>>>>>> d6027d5... Document profiling
 
 ## releasing
 

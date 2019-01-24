@@ -24,6 +24,7 @@ var debugFlag = flag.Bool("d", false, "Extra debug logging")
 var versionFlag = flag.Bool("v", false, "Prints version")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+var ShouldLog = false
 
 func init() {
 	flag.Parse()
@@ -34,9 +35,9 @@ func init() {
 	}
 
 	if os.Getenv("HESABU_DEBUG") == "true" || *debugFlag {
+		ShouldLog = true
+		hesabu.ShouldLog = ShouldLog
 		log.SetOutput(os.Stderr)
-	} else {
-		log.SetOutput(ioutil.Discard)
 	}
 
 	if *cpuprofile != "" {
@@ -73,33 +74,25 @@ You need to either supply a filename or pipe to hesabu
 	if len(parsedEquations.Errors) > 0 {
 		logErrors(parsedEquations.Errors)
 		os.Exit(1)
-	} else {
-		solutions, err := parsedEquations.Solve()
-		if err != nil {
-			var evalErrors []hesabu.EvalError
-			var hesabuerr hesabu.EvalError
+	}
 
-			ok, err2 := err.(*hesabu.CustomError)
-			if !err2 {
-				panic("ddd")
-			}
-			if ok != nil {
-				hesabuerr = ok.EvalError
-			}
-
-			evalErrors = append(evalErrors, hesabuerr)
-			logErrors(evalErrors)
+	solutions, err := parsedEquations.Solve()
+	if err != nil {
+		if customError, ok := err.(*hesabu.CustomError); ok {
+			evalError := customError.EvalError
+			logErrors([]hesabu.EvalError{evalError})
 			os.Exit(1)
 		} else {
-			logSolution(solutions)
+			panic("Only expected a custom error")
 		}
 	}
+
+	logSolution(solutions)
 
 	stopProfilingCPU()
 	if *memprofile != "" {
 		startProfilingMemory(*memprofile)
 	}
-
 }
 
 func logErrors(errors []hesabu.EvalError) {
@@ -142,14 +135,18 @@ func getInput(flag_arguments []string) ([]byte, error) {
 }
 
 func getEquations(raw []byte) (map[string]string, error) {
-	log.Printf("equations to parse %s", string(raw))
 	var results map[string]string
 	err := json.Unmarshal(raw, &results)
 	if err != nil {
-		log.Printf("equations not loaded %v ", err)
+		if ShouldLog {
+			log.Printf("equations to parse %s", string(raw))
+			log.Printf("equations not loaded %v ", err)
+		}
 		return nil, err
 	}
-	log.Printf("equations loaded: %d ", len(results))
+	if ShouldLog {
+		log.Printf("equations loaded: %d ", len(results))
+	}
 	return results, nil
 }
 

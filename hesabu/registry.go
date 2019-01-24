@@ -164,8 +164,15 @@ func minFunction(args ...interface{}) (interface{}, error) {
 
 func sumFunction(args ...interface{}) (interface{}, error) {
 	total := float64(0.0)
-	for _, arg := range args {
-		total += arg.(float64)
+	for _, a := range args {
+		if v, ok := a.(float64); ok {
+			total += v
+		} else {
+			return nil, &customFunctionError{
+				functionName: "sumFunction",
+				err:          fmt.Sprintf("Unspoorted type to sum: %T", v),
+			}
+		}
 	}
 	return total, nil
 }
