@@ -86,6 +86,8 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 		if v, ok := result.(float64); ok {
 			if math.IsInf(v, 0) {
 				return parsedEquations.newSingleError(key, "Divide by zero")
+			} else if math.IsNaN(v) {
+				return parsedEquations.newSingleError(key, "NaN")
 			} else {
 				solutions[key] = v
 			}

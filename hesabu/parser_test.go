@@ -298,6 +298,36 @@ func TestUnboundVariables(t *testing.T) {
 	}
 }
 
+func TestDetectsAndReportsNan(t *testing.T) {
+	functions := Functions()
+	equations := map[string]string{
+		"a":      "0",
+		"b":      "0",
+		"result": "a/b",
+	}
+	parsedEquations := Parse(equations, functions)
+	_, err := parsedEquations.Solve()
+	if _, ok := err.(*CustomError); !ok {
+		t.Logf("Expected an NaN error because 0/0 is Not A Number")
+		t.Fail()
+	}
+}
+
+func TestDetectsAndReportsInf(t *testing.T) {
+	functions := Functions()
+	equations := map[string]string{
+		"a":      "5",
+		"b":      "0",
+		"result": "a/b",
+	}
+	parsedEquations := Parse(equations, functions)
+	_, err := parsedEquations.Solve()
+	if _, ok := err.(*CustomError); !ok {
+		t.Logf("Expected an Inf error because 5/0 is quite a lot")
+		t.Fail()
+	}
+}
+
 func BenchmarkParse(b *testing.B) {
 	functions := Functions()
 	raw, err := ioutil.ReadFile("../test/very_large_set_of_equations.json")

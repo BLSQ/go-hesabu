@@ -104,7 +104,15 @@ func logErrors(errors []hesabu.EvalError) {
 }
 
 func logSolution(solutions map[string]interface{}) {
-	b, _ := json.MarshalIndent(solutions, "", "  ")
+	b, err := json.MarshalIndent(solutions, "", "  ")
+	if err != nil {
+		logErrors([]hesabu.EvalError{
+			{
+				Source:     "General",
+				Expression: "General",
+				Message:    fmt.Sprintf("Could not generate JSON\n%s", err),
+			}})
+	}
 	s := string(b)
 	fmt.Println(s)
 }
