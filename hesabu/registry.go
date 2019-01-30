@@ -225,7 +225,7 @@ func evalArrayFunction(args ...interface{}) (interface{}, error) {
 
 	if err != nil {
 		return nil, &customFunctionError{
-			functionName: "evalArray",
+			functionName: "EVAL_ARRAY()",
 			err:          fmt.Sprintf("Meta formula: %v", err),
 		}
 	}
@@ -238,8 +238,8 @@ func evalArrayFunction(args ...interface{}) (interface{}, error) {
 		result, error_eval := expression.Evaluate(parameters)
 		if error_eval != nil {
 			return nil, &customFunctionError{
-				functionName: "evalArray",
-				err:          fmt.Sprintf("Inner eval: %v", error_eval),
+				functionName: "EVAL_ARRAY()",
+				err:          fmt.Sprintf("%v. We only know '%s' and '%s'", error_eval, key1, key2),
 			}
 		}
 		results = append(results, result)
