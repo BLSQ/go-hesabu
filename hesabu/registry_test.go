@@ -97,3 +97,15 @@ func TestRandBetweenFunction(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestBothUpperCaseAndLowerCaseVariantsAreFound(t *testing.T) {
+	for name := range Functions() {
+		if strings.ToLower(name) == name {
+			upper := strings.ToUpper(name)
+			if _, ok := Functions()[upper]; !ok {
+				t.Logf("%v found but no %v", name, upper)
+				t.Fail()
+			}
+		}
+	}
+}
