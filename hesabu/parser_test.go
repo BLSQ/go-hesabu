@@ -78,7 +78,7 @@ func TestEvalArrayFunction(t *testing.T) {
 	testCases := []ParserTest{
 		{
 			Name:     "Simple case",
-			Input:    "sum(eval_array('a', (1,2,5), 'b', (3,4,5), 'a + b'))",
+			Input:    "sum(EVAL_ARRAY('a', (1,2,5), 'b', (3,4,5), 'a + b'))",
 			Solution: 20.0,
 		},
 		{

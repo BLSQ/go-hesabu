@@ -1,6 +1,7 @@
 package hesabu
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -46,14 +47,21 @@ func TestGeneric(t *testing.T) {
 	}
 
 	for _, table := range tables {
-		functionToCall := Functions()[table.functionToCall]
-
-		result, err := functionToCall(table.args...)
-		if err != nil {
-			t.Errorf("errored")
-		}
-		if result != table.expected {
-			t.Errorf("%s(%v) was incorrect, got: %v, want: %v.", table.functionToCall, table.args, result, table.expected)
+		variants := []string{table.functionToCall, strings.ToUpper(table.functionToCall)}
+		for _, variant := range variants {
+			functionToCall, ok := Functions()[variant]
+			if !ok {
+				t.Errorf("Function %v was not found in functions table", variant)
+				t.Fail()
+				continue
+			}
+			result, err := functionToCall(table.args...)
+			if err != nil {
+				t.Errorf("errored")
+			}
+			if result != table.expected {
+				t.Errorf("%s(%v) was incorrect, got: %v, want: %v.", variant, table.args, result, table.expected)
+			}
 		}
 	}
 }
@@ -87,5 +95,17 @@ func TestRandBetweenFunction(t *testing.T) {
 	if fvalue < 1.0 || fvalue > 10.0 {
 		t.Logf("randbetween should generate within range specified")
 		t.Fail()
+	}
+}
+
+func TestBothUpperCaseAndLowerCaseVariantsAreFound(t *testing.T) {
+	for name := range Functions() {
+		if strings.ToLower(name) == name {
+			upper := strings.ToUpper(name)
+			if _, ok := Functions()[upper]; !ok {
+				t.Logf("%v found but no %v", name, upper)
+				t.Fail()
+			}
+		}
 	}
 }
