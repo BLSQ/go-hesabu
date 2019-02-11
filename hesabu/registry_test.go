@@ -1,8 +1,8 @@
 package hesabu
 
 import (
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestGeneric(t *testing.T) {
@@ -61,7 +61,7 @@ func TestGeneric(t *testing.T) {
 			}
 			if result != table.expected {
 				t.Errorf("%s(%v) was incorrect, got: %v, want: %v.", variant, table.args, result, table.expected)
-			}			
+			}
 		}
 	}
 }
