@@ -2,6 +2,7 @@ package hesabu
 
 import (
 	"testing"
+	"strings"
 )
 
 func TestGeneric(t *testing.T) {
@@ -46,14 +47,21 @@ func TestGeneric(t *testing.T) {
 	}
 
 	for _, table := range tables {
-		functionToCall := Functions()[table.functionToCall]
-
-		result, err := functionToCall(table.args...)
-		if err != nil {
-			t.Errorf("errored")
-		}
-		if result != table.expected {
-			t.Errorf("%s(%v) was incorrect, got: %v, want: %v.", table.functionToCall, table.args, result, table.expected)
+		variants := []string{table.functionToCall, strings.ToUpper(table.functionToCall)}
+		for _, variant := range variants {
+			functionToCall, ok := Functions()[variant]
+			if !ok {
+				t.Errorf("Function %v was not found in functions table", variant)
+				t.Fail()
+				continue
+			}
+			result, err := functionToCall(table.args...)
+			if err != nil {
+				t.Errorf("errored")
+			}
+			if result != table.expected {
+				t.Errorf("%s(%v) was incorrect, got: %v, want: %v.", variant, table.args, result, table.expected)
+			}			
 		}
 	}
 }
