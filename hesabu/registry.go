@@ -24,6 +24,8 @@ var evalExps = make(map[string]*govaluate.EvaluableExpression)
 var functions = map[string]govaluate.ExpressionFunction{
 	"ABS":         absFunction,
 	"abs":         absFunction,
+	"sqrt":        sqrtFunction,
+	"SQRT":        sqrtFunction,
 	"ACCESS":      accessFunction,
 	"access":      accessFunction,
 	"ARRAY":       arrayFunction,
@@ -116,6 +118,23 @@ func roundFunction(args ...interface{}) (interface{}, error) {
 
 func absFunction(args ...interface{}) (interface{}, error) {
 	return math.Abs(args[0].(float64)), nil
+}
+
+func sqrtFunction(args ...interface{}) (interface{}, error) {
+	float, ok := args[0].(float64)
+	if !ok {
+		return nil, &customFunctionError{
+			functionName: "SQRT",
+			err:          fmt.Sprintf("Expected '%v' to be a float64 expression.", args[0]),
+		}
+	}
+	if float < 0 {
+		return nil, &customFunctionError{
+			functionName: "SQRT",
+			err:          fmt.Sprintf("Expected '%v' to be a float 0 or positive.", args[0]),
+		}
+	}
+	return math.Sqrt(float), nil
 }
 
 func ifFunction(args ...interface{}) (interface{}, error) {
