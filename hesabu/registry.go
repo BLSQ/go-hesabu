@@ -6,6 +6,7 @@ import (
 	"math/rand"
 
 	"github.com/Knetic/govaluate"
+	"github.com/gleicon/go-descriptive-statistics"
 )
 
 type customFunctionError struct {
@@ -32,6 +33,8 @@ var functions = map[string]govaluate.ExpressionFunction{
 	"array":       arrayFunction,
 	"AVG":         averageFunction,
 	"avg":         averageFunction,
+	"stdev":       stdevFunction,
+	"STDEV":       stdevFunction,
 	"IF":          ifFunction,
 	"If":          ifFunction,
 	"if":          ifFunction,
@@ -195,6 +198,14 @@ func sumFunction(args ...interface{}) (interface{}, error) {
 		}
 	}
 	return total, nil
+}
+
+func stdevFunction(args ...interface{}) (interface{}, error) {
+	values := make(descriptive_statistics.Enum, len(args))
+	for i := range args {
+		values[i] = args[i].(float64)
+	}
+	return values.StandardDeviation(), nil
 }
 
 // A noop function in this context, mainly added for api parity with

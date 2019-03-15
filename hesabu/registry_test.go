@@ -34,6 +34,8 @@ func TestGeneric(t *testing.T) {
 
 		{"sum", []interface{}{1.0, 2.0, 3.0}, 6.0},
 
+		{"stdev", []interface{}{1.0, 2.0, 13.0, 3.0, 7.0, 9.0}, 4.258977446393546},
+
 		{"round", []interface{}{33.3333333}, 33.0},
 		{"round", []interface{}{33.3333333, 2.0}, 33.33},
 
