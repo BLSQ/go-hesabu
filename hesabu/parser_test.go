@@ -365,3 +365,19 @@ func BenchmarkSolve(b *testing.B) {
 		parsedEquations.Solve()
 	}
 }
+
+func TestSqrtFunction(t *testing.T) {
+	testCases := []ParserTest{
+		{
+			Name:     "Simple case",
+			Input:    "sqrt(4)",
+			Solution: 2.0,
+		},
+		{
+			Name:          "No imaginary support",
+			Input:         "sqrt(-1)",
+			SolutionError: "customErrorFunction",
+		},
+	}
+	runEvaluationTests(testCases, t)
+}
