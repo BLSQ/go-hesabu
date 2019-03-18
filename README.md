@@ -48,13 +48,7 @@ you will get
 require a go 1.11
 
 ```
-mkdir -p $GOPATH/src/github.com/BLSQ
-cd $GOPATH/src/github.com/BLSQ
-git clone git@github.com:BLSQ/go-hesabu.git
-cd go-hesabu
-go test github.com/BLSQ/go-hesabu/hesabu -coverprofile=coverage.out
-go tool cover -func=coverage.out
-go tool cover -html=coverage.out
+./script/test && go tool cover -func=coverage.out && go tool cover  -html=coverage.out -o coverage.html
 go run hesabu.go ./test/small.json
 ```
 

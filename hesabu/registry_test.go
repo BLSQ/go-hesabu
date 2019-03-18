@@ -34,7 +34,7 @@ func TestGeneric(t *testing.T) {
 
 		{"sum", []interface{}{1.0, 2.0, 3.0}, 6.0},
 
-		{"stdev", []interface{}{1.0, 2.0, 13.0, 3.0, 7.0, 9.0}, 4.258977446393546},
+		{"stdevp", []interface{}{1.0, 2.0, 13.0, 3.0, 7.0, 9.0}, 4.258977446393546},
 
 		{"round", []interface{}{33.3333333}, 33.0},
 		{"round", []interface{}{33.3333333, 2.0}, 33.33},
@@ -67,6 +67,24 @@ func TestGeneric(t *testing.T) {
 				t.Errorf("%s(%v) was incorrect, got: %v, want: %v.", variant, table.args, result, table.expected)
 			}
 		}
+	}
+}
+
+func TestSqrtFunctionWithIncorrectBool(t *testing.T) {
+	inputData := []interface{}{true}
+	_, err := Functions()["sqrt"](inputData...)
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
+		t.Fail()
+	}
+}
+
+func TestSqrtFunctionWithIncorrectNegative(t *testing.T) {
+	inputData := []interface{}{-1.0}
+	_, err := Functions()["sqrt"](inputData...)
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
+		t.Fail()
 	}
 }
 
