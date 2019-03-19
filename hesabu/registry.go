@@ -6,6 +6,7 @@ import (
 	"math/rand"
 
 	"github.com/Knetic/govaluate"
+	"github.com/gleicon/go-descriptive-statistics"
 )
 
 type customFunctionError struct {
@@ -24,12 +25,16 @@ var evalExps = make(map[string]*govaluate.EvaluableExpression)
 var functions = map[string]govaluate.ExpressionFunction{
 	"ABS":         absFunction,
 	"abs":         absFunction,
+	"sqrt":        sqrtFunction,
+	"SQRT":        sqrtFunction,
 	"ACCESS":      accessFunction,
 	"access":      accessFunction,
 	"ARRAY":       arrayFunction,
 	"array":       arrayFunction,
 	"AVG":         averageFunction,
 	"avg":         averageFunction,
+	"stdevp":      stdevFunction,
+	"STDEVP":      stdevFunction,
 	"IF":          ifFunction,
 	"If":          ifFunction,
 	"if":          ifFunction,
@@ -118,6 +123,23 @@ func absFunction(args ...interface{}) (interface{}, error) {
 	return math.Abs(args[0].(float64)), nil
 }
 
+func sqrtFunction(args ...interface{}) (interface{}, error) {
+	float, ok := args[0].(float64)
+	if !ok {
+		return nil, &customFunctionError{
+			functionName: "SQRT",
+			err:          fmt.Sprintf("Expected '%v' to be a float64 expression.", args[0]),
+		}
+	}
+	if float < 0 {
+		return nil, &customFunctionError{
+			functionName: "SQRT",
+			err:          fmt.Sprintf("Expected '%v' to be a float 0 or positive.", args[0]),
+		}
+	}
+	return math.Sqrt(float), nil
+}
+
 func ifFunction(args ...interface{}) (interface{}, error) {
 	var result interface{}
 	bool, ok := args[0].(bool)
@@ -176,6 +198,14 @@ func sumFunction(args ...interface{}) (interface{}, error) {
 		}
 	}
 	return total, nil
+}
+
+func stdevFunction(args ...interface{}) (interface{}, error) {
+	values := make(descriptive_statistics.Enum, len(args))
+	for i := range args {
+		values[i] = args[i].(float64)
+	}
+	return values.StandardDeviation(), nil
 }
 
 // A noop function in this context, mainly added for api parity with
