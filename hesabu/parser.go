@@ -69,6 +69,11 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 		return nil, &CustomError{EvalError: evalError}
 	}
 
+	if len(topsort) != len(parsedEquations.RawEquations) {
+		evalError := EvalError{Message: "Topological sort not same length as inputted equations", Source: "general", Expression: "general"}
+		return nil, &CustomError{EvalError: evalError}
+	}
+
 	for _, key := range topsort {
 		expression, ok := parsedEquations.Equations[key]
 		if !ok {
