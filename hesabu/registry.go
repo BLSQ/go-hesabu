@@ -104,8 +104,23 @@ func scoreTableFunction(args ...interface{}) (interface{}, error) {
 	return args[0], nil
 }
 
+// access(ARRAY(1,2,3), 0) => 1
+//
+// Due the way we're getting the `args`, everything is just one array,
+// we use the last element as the requested index, this also means:
+//
+// access(ARRAY(1,2,0)) => 1
+//
+// If the index is out of range an error will be returned.
 func accessFunction(args ...interface{}) (interface{}, error) {
 	index := int(args[len(args)-1].(float64))
+	if index > len(args)-1 {
+		return nil, &customFunctionError{
+			functionName: "ACCESS",
+			err:          fmt.Sprintf("Tried to access element at index %v in  '%v'.", args[len(args)-1], args[0:len(args)-1]),
+		}
+	}
+
 	return args[index], nil
 }
 

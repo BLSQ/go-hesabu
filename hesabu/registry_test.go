@@ -131,3 +131,12 @@ func TestBothUpperCaseAndLowerCaseVariantsAreFound(t *testing.T) {
 		}
 	}
 }
+
+func TestAccessOutOfRangeError(t *testing.T) {
+	inputData := []interface{}{1.0, 2.0, 8.0}
+	_, err := Functions()["access"](inputData...)
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
+		t.Fail()
+	}
+}
