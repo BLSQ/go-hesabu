@@ -48,6 +48,10 @@ var functions = map[string]govaluate.ExpressionFunction{
 	"randbetween": randbetweenFunction,
 	"ROUND":       roundFunction,
 	"round":       roundFunction,
+	"FLOOR":       floorFunction,
+	"floor":       floorFunction,
+	"CEIL":        ceilFunction,
+	"ceil":        ceilFunction,
 	"SAFE_DIV":    safeDivFuntion,
 	"Safe_div":    safeDivFuntion,
 	"safe_div":    safeDivFuntion,
@@ -130,8 +134,27 @@ func roundFunction(args ...interface{}) (interface{}, error) {
 		places = int(args[1].(float64))
 	}
 	f := args[0].(float64)
+
 	shift := math.Pow(10, float64(places))
 	return (math.Round(f*shift) / shift), nil
+}
+
+func floorFunction(args ...interface{}) (interface{}, error) {
+	multiple := 1.0
+	if len(args) == 2 {
+		multiple = args[1].(float64)
+	}
+	f := args[0].(float64)
+	return (math.Floor(f/multiple) * multiple), nil
+}
+
+func ceilFunction(args ...interface{}) (interface{}, error) {
+	multiple := 1.0
+	if len(args) == 2 {
+		multiple = args[1].(float64)
+	}
+	f := args[0].(float64)
+	return (math.Ceil(f/multiple) * multiple), nil
 }
 
 func absFunction(args ...interface{}) (interface{}, error) {

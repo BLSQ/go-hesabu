@@ -39,6 +39,16 @@ func TestGeneric(t *testing.T) {
 		{"round", []interface{}{33.3333333}, 33.0},
 		{"round", []interface{}{33.3333333, 2.0}, 33.33},
 
+		{"floor", []interface{}{33.3333333}, 33.0},
+		{"floor", []interface{}{-33.3333333}, -34.0},
+		{"floor", []interface{}{33.3333333, 10.0}, 30.0},
+		{"floor", []interface{}{-33.3333333, 10.0}, -40.0},
+
+		{"ceil", []interface{}{33.3333333}, 34.0},
+		{"ceil", []interface{}{-33.3333333}, -33.0},
+		{"ceil", []interface{}{33.3333333, 10.0}, 40.0},
+		{"ceil", []interface{}{-33.3333333, 10.0}, -30.0},
+
 		{"abs", []interface{}{1.0}, 1.0},
 		{"abs", []interface{}{-1.0}, 1.0},
 
