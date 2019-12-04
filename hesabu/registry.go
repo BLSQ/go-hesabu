@@ -50,8 +50,8 @@ var functions = map[string]govaluate.ExpressionFunction{
 	"round":       roundFunction,
 	"FLOOR":       floorFunction,
 	"floor":       floorFunction,
-	"CEIL":        ceilFunction,
-	"ceil":        ceilFunction,
+	"CEILING":     ceilingFunction,
+	"ceiling":     ceilingFunction,
 	"SAFE_DIV":    safeDivFuntion,
 	"Safe_div":    safeDivFuntion,
 	"safe_div":    safeDivFuntion,
@@ -139,6 +139,9 @@ func roundFunction(args ...interface{}) (interface{}, error) {
 	return (math.Round(f*shift) / shift), nil
 }
 
+// mimic FLOOR https://support.office.com/en-us/article/floor-function-14bb497c-24f2-4e04-b327-b0b4de5a8886
+// by default floor to nearest multiple of 1.0
+// but can be passed as an optional argument
 func floorFunction(args ...interface{}) (interface{}, error) {
 	multiple := 1.0
 	if len(args) == 2 {
@@ -148,7 +151,10 @@ func floorFunction(args ...interface{}) (interface{}, error) {
 	return (math.Floor(f/multiple) * multiple), nil
 }
 
-func ceilFunction(args ...interface{}) (interface{}, error) {
+// CEILING https://support.office.com/en-us/article/ceiling-function-0a5cd7c8-0720-4f0a-bd2c-c943e510899f
+// by default ceil to nearest multiple of 1.0
+// but can be passed as an optional argument
+func ceilingFunction(args ...interface{}) (interface{}, error) {
 	multiple := 1.0
 	if len(args) == 2 {
 		multiple = args[1].(float64)
