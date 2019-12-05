@@ -52,6 +52,8 @@ var functions = map[string]govaluate.ExpressionFunction{
 	"floor":       floorFunction,
 	"CEILING":     ceilingFunction,
 	"ceiling":     ceilingFunction,
+	"trunc":       truncFunction,
+	"TRUNC":       truncFunction,
 	"SAFE_DIV":    safeDivFuntion,
 	"Safe_div":    safeDivFuntion,
 	"safe_div":    safeDivFuntion,
@@ -161,6 +163,20 @@ func ceilingFunction(args ...interface{}) (interface{}, error) {
 	}
 	f := args[0].(float64)
 	return (math.Ceil(f/multiple) * multiple), nil
+}
+
+// TRUNC https://support.office.com/en-us/article/trunc-function-8b86a64c-3127-43db-ba14-aa5ceb292721
+// by default 0 digits after the decimal
+// but can passed an optional argument to ask for more
+func truncFunction(args ...interface{}) (interface{}, error) {
+	places := 0
+	if len(args) == 2 {
+		places = int(args[1].(float64))
+	}
+	f := args[0].(float64)
+
+	shift := math.Pow(10, float64(places))
+	return (float64(int(f*shift)) / shift), nil
 }
 
 func absFunction(args ...interface{}) (interface{}, error) {

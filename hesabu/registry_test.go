@@ -49,6 +49,14 @@ func TestGeneric(t *testing.T) {
 		{"ceiling", []interface{}{33.3333333, 10.0}, 40.0},
 		{"ceiling", []interface{}{-33.3333333, 10.0}, -30.0},
 
+		{"trunc", []interface{}{1.2345678}, 1.0},
+		{"trunc", []interface{}{-1.2345678}, -1.0},
+		{"trunc", []interface{}{1.2345678, 2.0}, 1.23},
+		{"trunc", []interface{}{1.2345678, 3.0}, 1.234},
+		{"trunc", []interface{}{1.2345678, 4.0}, 1.2345},
+		{"trunc", []interface{}{1.2345678, 5.0}, 1.23456},
+		{"round", []interface{}{1.2345678, 5.0}, 1.23457},
+
 		{"abs", []interface{}{1.0}, 1.0},
 		{"abs", []interface{}{-1.0}, 1.0},
 
