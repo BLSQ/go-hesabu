@@ -130,14 +130,27 @@ func accessFunction(args ...interface{}) (interface{}, error) {
 	return args[index], nil
 }
 
-func roundFunction(args ...interface{}) (interface{}, error) {
+func getShiftPlaces(args []interface{}) float64 {
 	places := 0
 	if len(args) == 2 {
 		places = int(args[1].(float64))
 	}
-	f := args[0].(float64)
 
 	shift := math.Pow(10, float64(places))
+	return shift
+}
+
+func getMultiple(args []interface{}) float64 {
+	multiple := 1.0
+	if len(args) == 2 {
+		multiple = args[1].(float64)
+	}
+	return multiple
+}
+
+func roundFunction(args ...interface{}) (interface{}, error) {
+	shift := getShiftPlaces(args)
+	f := args[0].(float64)
 	return (math.Round(f*shift) / shift), nil
 }
 
@@ -145,10 +158,7 @@ func roundFunction(args ...interface{}) (interface{}, error) {
 // by default floor to nearest multiple of 1.0
 // but can be passed as an optional argument
 func floorFunction(args ...interface{}) (interface{}, error) {
-	multiple := 1.0
-	if len(args) == 2 {
-		multiple = args[1].(float64)
-	}
+	multiple := getMultiple(args)
 	f := args[0].(float64)
 	return (math.Floor(f/multiple) * multiple), nil
 }
@@ -157,10 +167,7 @@ func floorFunction(args ...interface{}) (interface{}, error) {
 // by default ceil to nearest multiple of 1.0
 // but can be passed as an optional argument
 func ceilingFunction(args ...interface{}) (interface{}, error) {
-	multiple := 1.0
-	if len(args) == 2 {
-		multiple = args[1].(float64)
-	}
+	multiple := getMultiple(args)
 	f := args[0].(float64)
 	return (math.Ceil(f/multiple) * multiple), nil
 }
@@ -169,13 +176,8 @@ func ceilingFunction(args ...interface{}) (interface{}, error) {
 // by default 0 digits after the decimal
 // but can passed an optional argument to ask for more
 func truncFunction(args ...interface{}) (interface{}, error) {
-	places := 0
-	if len(args) == 2 {
-		places = int(args[1].(float64))
-	}
+	shift := getShiftPlaces(args)
 	f := args[0].(float64)
-
-	shift := math.Pow(10, float64(places))
 	return (float64(int(f*shift)) / shift), nil
 }
 
