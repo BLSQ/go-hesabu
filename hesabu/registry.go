@@ -48,6 +48,12 @@ var functions = map[string]govaluate.ExpressionFunction{
 	"randbetween": randbetweenFunction,
 	"ROUND":       roundFunction,
 	"round":       roundFunction,
+	"FLOOR":       floorFunction,
+	"floor":       floorFunction,
+	"CEILING":     ceilingFunction,
+	"ceiling":     ceilingFunction,
+	"trunc":       truncFunction,
+	"TRUNC":       truncFunction,
 	"SAFE_DIV":    safeDivFuntion,
 	"Safe_div":    safeDivFuntion,
 	"safe_div":    safeDivFuntion,
@@ -124,14 +130,52 @@ func accessFunction(args ...interface{}) (interface{}, error) {
 	return args[index], nil
 }
 
-func roundFunction(args ...interface{}) (interface{}, error) {
-	places := 0
-	if len(args) == 2 {
-		places = int(args[1].(float64))
-	}
-	f := args[0].(float64)
+func getShiftPlaces(args []interface{}) float64 {
+	places := int(getSecondArgsAsFloat(args, 0.0))
+
 	shift := math.Pow(10, float64(places))
+	return shift
+}
+
+func getSecondArgsAsFloat(args []interface{}, defaultValue float64) float64 {
+	value := defaultValue
+	if len(args) == 2 {
+		value = args[1].(float64)
+	}
+	return value
+}
+
+func roundFunction(args ...interface{}) (interface{}, error) {
+	shift := getShiftPlaces(args)
+	f := args[0].(float64)
 	return (math.Round(f*shift) / shift), nil
+}
+
+// mimic FLOOR https://support.office.com/en-us/article/floor-function-14bb497c-24f2-4e04-b327-b0b4de5a8886
+// by default floor to nearest multiple of 1.0
+// but can be passed as an optional argument
+func floorFunction(args ...interface{}) (interface{}, error) {
+	multiple := getSecondArgsAsFloat(args, 1.0)
+	f := args[0].(float64)
+	return (math.Floor(f/multiple) * multiple), nil
+}
+
+// CEILING https://support.office.com/en-us/article/ceiling-function-0a5cd7c8-0720-4f0a-bd2c-c943e510899f
+// by default ceil to nearest multiple of 1.0
+// but can be passed as an optional argument
+func ceilingFunction(args ...interface{}) (interface{}, error) {
+	multiple := getSecondArgsAsFloat(args, 1.0)
+	f := args[0].(float64)
+	return (math.Ceil(f/multiple) * multiple), nil
+}
+
+// TRUNC https://support.office.com/en-us/article/trunc-function-8b86a64c-3127-43db-ba14-aa5ceb292721
+// by default 0 digits after the decimal
+// but can passed an optional argument to ask for more
+func truncFunction(args ...interface{}) (interface{}, error) {
+	shift := getShiftPlaces(args)
+	f := args[0].(float64)
+	return (float64(int(f*shift)) / shift), nil
 }
 
 func absFunction(args ...interface{}) (interface{}, error) {
