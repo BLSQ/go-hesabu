@@ -23,48 +23,48 @@ var evalExps = make(map[string]*govaluate.EvaluableExpression)
 
 // Functions used by `evalArray`
 var functions = map[string]govaluate.ExpressionFunction{
-	"ABS":         absFunction,
-	"abs":         absFunction,
-	"sqrt":        sqrtFunction,
-	"SQRT":        sqrtFunction,
+	"ABS":         ensureFloats(absFunction),
+	"abs":         ensureFloats(absFunction),
+	"sqrt":        ensureFloats(sqrtFunction),
+	"SQRT":        ensureFloats(sqrtFunction),
 	"ACCESS":      accessFunction,
 	"access":      accessFunction,
 	"ARRAY":       arrayFunction,
 	"array":       arrayFunction,
-	"AVG":         averageFunction,
-	"avg":         averageFunction,
-	"stdevp":      stdevFunction,
-	"STDEVP":      stdevFunction,
+	"AVG":         ensureFloats(averageFunction),
+	"avg":         ensureFloats(averageFunction),
+	"stdevp":      ensureFloats(stdevFunction),
+	"STDEVP":      ensureFloats(stdevFunction),
 	"IF":          ifFunction,
 	"If":          ifFunction,
 	"if":          ifFunction,
-	"MAX":         maxFunction,
-	"Max":         maxFunction,
-	"max":         maxFunction,
-	"MIN":         minFunction,
-	"Min":         minFunction,
-	"min":         minFunction,
-	"RANDBETWEEN": randbetweenFunction,
-	"randbetween": randbetweenFunction,
-	"ROUND":       roundFunction,
-	"round":       roundFunction,
-	"FLOOR":       floorFunction,
-	"floor":       floorFunction,
-	"CEILING":     ceilingFunction,
-	"ceiling":     ceilingFunction,
-	"trunc":       truncFunction,
-	"TRUNC":       truncFunction,
-	"SAFE_DIV":    safeDivFuntion,
-	"Safe_div":    safeDivFuntion,
-	"safe_div":    safeDivFuntion,
-	"SCORE_TABLE": scoreTableFunction,
-	"score_Table": scoreTableFunction,
-	"score_table": scoreTableFunction,
+	"MAX":         ensureFloats(maxFunction),
+	"Max":         ensureFloats(maxFunction),
+	"max":         ensureFloats(maxFunction),
+	"MIN":         ensureFloats(minFunction),
+	"Min":         ensureFloats(minFunction),
+	"min":         ensureFloats(minFunction),
+	"RANDBETWEEN": ensureFloats(randbetweenFunction),
+	"randbetween": ensureFloats(randbetweenFunction),
+	"ROUND":       ensureFloats(roundFunction),
+	"round":       ensureFloats(roundFunction),
+	"FLOOR":       ensureFloats(floorFunction),
+	"floor":       ensureFloats(floorFunction),
+	"CEILING":     ensureFloats(ceilingFunction),
+	"ceiling":     ensureFloats(ceilingFunction),
+	"trunc":       ensureFloats(truncFunction),
+	"TRUNC":       ensureFloats(truncFunction),
+	"SAFE_DIV":    ensureFloats(safeDivFuntion),
+	"Safe_div":    ensureFloats(safeDivFuntion),
+	"safe_div":    ensureFloats(safeDivFuntion),
+	"SCORE_TABLE": ensureFloats(scoreTableFunction),
+	"score_Table": ensureFloats(scoreTableFunction),
+	"score_table": ensureFloats(scoreTableFunction),
 	"strlen":      strlen,
 	"STRLEN":      strlen,
-	"SUM":         sumFunction,
-	"Sum":         sumFunction,
-	"sum":         sumFunction,
+	"SUM":         ensureFloats(sumFunction),
+	"Sum":         ensureFloats(sumFunction),
+	"sum":         ensureFloats(sumFunction),
 }
 
 func randbetweenFunction(args ...interface{}) (interface{}, error) {
@@ -225,7 +225,8 @@ func safeDivFuntion(args ...interface{}) (interface{}, error) {
 }
 
 func maxFunction(args ...interface{}) (interface{}, error) {
-	max := args[0].(float64)
+	max, _ := args[0].(float64)
+
 	for _, arg := range args {
 		if arg.(float64) > max {
 			max = arg.(float64)
@@ -350,6 +351,22 @@ func strlen(args ...interface{}) (interface{}, error) {
 	length := len(args[0].(string))
 	return (float64)(length), nil
 }
+
+func checkFloats(f func(args ...interface{}) (interface{}, error)) func(args ...interface{}) (interface{},error) {
+	return func(args ...interface{}) (interface{}, error) {
+		for _, a := range args {
+			if v, ok := a.(float64); ok {
+			} else {
+				return nil, &customFunctionError{
+					functionName: "sumFunction",
+					err:          fmt.Sprintf("Unsupported type to sum: expected '%v' to be a %T", a, v),
+				}
+			}
+		}
+		return f(args...)
+	}	
+}
+
 
 // Ensures that the interface passed is a slice, it's like Array.wrap
 // but in golang.
