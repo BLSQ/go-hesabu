@@ -189,3 +189,12 @@ func TestCalDaysInMonthInvalidMonthGreater(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestCalDaysInMonthInvalidMontType(t *testing.T) {
+	inputData := []interface{}{2020.0, "a"}
+	_, err := Functions()["cal_days_in_month"](inputData...)
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
+		t.Fail()
+	}
+}
