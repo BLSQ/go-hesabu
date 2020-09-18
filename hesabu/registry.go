@@ -25,48 +25,48 @@ var evalExps = make(map[string]*govaluate.EvaluableExpression)
 
 // Functions used by `evalArray`
 var functions = map[string]govaluate.ExpressionFunction{
-	"ABS":         typeCheck(isFloat64,absFunction),
-	"abs":         typeCheck(isFloat64,absFunction),
-	"sqrt":        typeCheck(isFloat64,sqrtFunction),
-	"SQRT":        typeCheck(isFloat64,sqrtFunction),
+	"ABS":         typeCheck(isFloat64, absFunction),
+	"abs":         typeCheck(isFloat64, absFunction),
+	"sqrt":        typeCheck(isFloat64, sqrtFunction),
+	"SQRT":        typeCheck(isFloat64, sqrtFunction),
 	"ACCESS":      accessFunction,
 	"access":      accessFunction,
 	"ARRAY":       arrayFunction,
 	"array":       arrayFunction,
-	"AVG":         typeCheck(isFloat64,averageFunction),
-	"avg":         typeCheck(isFloat64,averageFunction),
-	"stdevp":      typeCheck(isFloat64,stdevFunction),
-	"STDEVP":      typeCheck(isFloat64,stdevFunction),
+	"AVG":         typeCheck(isFloat64, averageFunction),
+	"avg":         typeCheck(isFloat64, averageFunction),
+	"stdevp":      typeCheck(isFloat64, stdevFunction),
+	"STDEVP":      typeCheck(isFloat64, stdevFunction),
 	"IF":          ifFunction,
 	"If":          ifFunction,
 	"if":          ifFunction,
-	"MAX":         typeCheck(isFloat64,maxFunction),
-	"Max":         typeCheck(isFloat64,maxFunction),
-	"max":         typeCheck(isFloat64,maxFunction),
-	"MIN":         typeCheck(isFloat64,minFunction),
-	"Min":         typeCheck(isFloat64,minFunction),
-	"min":         typeCheck(isFloat64,minFunction),
-	"RANDBETWEEN": typeCheck(isFloat64,randbetweenFunction),
-	"randbetween": typeCheck(isFloat64,randbetweenFunction),
-	"ROUND":       typeCheck(isFloat64,roundFunction),
-	"round":       typeCheck(isFloat64,roundFunction),
-	"FLOOR":       typeCheck(isFloat64,floorFunction),
-	"floor":       typeCheck(isFloat64,floorFunction),
-	"CEILING":     typeCheck(isFloat64,ceilingFunction),
-	"ceiling":     typeCheck(isFloat64,ceilingFunction),
-	"trunc":       typeCheck(isFloat64,truncFunction),
-	"TRUNC":       typeCheck(isFloat64,truncFunction),
-	"SAFE_DIV":    typeCheck(isFloat64,safeDivFuntion),
-	"Safe_div":    typeCheck(isFloat64,safeDivFuntion),
-	"safe_div":    typeCheck(isFloat64,safeDivFuntion),
-	"SCORE_TABLE": typeCheck(isFloat64,scoreTableFunction),
-	"score_Table": typeCheck(isFloat64,scoreTableFunction),
-	"score_table": typeCheck(isFloat64,scoreTableFunction),
+	"MAX":         typeCheck(isFloat64, maxFunction),
+	"Max":         typeCheck(isFloat64, maxFunction),
+	"max":         typeCheck(isFloat64, maxFunction),
+	"MIN":         typeCheck(isFloat64, minFunction),
+	"Min":         typeCheck(isFloat64, minFunction),
+	"min":         typeCheck(isFloat64, minFunction),
+	"RANDBETWEEN": typeCheck(isFloat64, randbetweenFunction),
+	"randbetween": typeCheck(isFloat64, randbetweenFunction),
+	"ROUND":       typeCheck(isFloat64, roundFunction),
+	"round":       typeCheck(isFloat64, roundFunction),
+	"FLOOR":       typeCheck(isFloat64, floorFunction),
+	"floor":       typeCheck(isFloat64, floorFunction),
+	"CEILING":     typeCheck(isFloat64, ceilingFunction),
+	"ceiling":     typeCheck(isFloat64, ceilingFunction),
+	"trunc":       typeCheck(isFloat64, truncFunction),
+	"TRUNC":       typeCheck(isFloat64, truncFunction),
+	"SAFE_DIV":    typeCheck(isFloat64, safeDivFuntion),
+	"Safe_div":    typeCheck(isFloat64, safeDivFuntion),
+	"safe_div":    typeCheck(isFloat64, safeDivFuntion),
+	"SCORE_TABLE": typeCheck(isFloat64, scoreTableFunction),
+	"score_Table": typeCheck(isFloat64, scoreTableFunction),
+	"score_table": typeCheck(isFloat64, scoreTableFunction),
 	"strlen":      strlen,
 	"STRLEN":      strlen,
-	"SUM":         typeCheck(isFloat64,sumFunction),
-	"Sum":         typeCheck(isFloat64,sumFunction),
-	"sum":         typeCheck(isFloat64,sumFunction),
+	"SUM":         typeCheck(isFloat64, sumFunction),
+	"Sum":         typeCheck(isFloat64, sumFunction),
+	"sum":         typeCheck(isFloat64, sumFunction),
 }
 
 func randbetweenFunction(args ...interface{}) (interface{}, error) {
@@ -362,7 +362,7 @@ func isFloat64(value interface{}) bool {
 	return false
 }
 
-func typeCheck(check inputsTypeCheck, f func(args ...interface{}) (interface{}, error)) func(args ...interface{}) (interface{},error) {
+func typeCheck(check inputsTypeCheck, f func(args ...interface{}) (interface{}, error)) func(args ...interface{}) (interface{}, error) {
 	return func(args ...interface{}) (interface{}, error) {
 		for _, a := range args {
 			if check(a) {
@@ -374,9 +374,8 @@ func typeCheck(check inputsTypeCheck, f func(args ...interface{}) (interface{}, 
 			}
 		}
 		return f(args...)
-	}	
+	}
 }
-
 
 // Ensures that the interface passed is a slice, it's like Array.wrap
 // but in golang.

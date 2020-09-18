@@ -168,7 +168,7 @@ func TestInvalidFloatInputs(t *testing.T) {
 		{"min", []interface{}{"amin", 1.0}},
 		{"score_table", []interface{}{"ascore", 0.0, 2.0, 50.0, 2.0, 10.0, 95.0}},
 		{"safe_div", []interface{}{"asafe", 0.0}},
-		{"avg", []interface{}{1.0,"aavg", 3.0}},
+		{"avg", []interface{}{1.0, "aavg", 3.0}},
 		{"sum", []interface{}{"asum"}},
 		{"stdevp", []interface{}{1.0, "astdevp"}},
 		{"round", []interface{}{"around"}},
@@ -195,5 +195,5 @@ func TestInvalidFloatInputs(t *testing.T) {
 				t.Fail()
 			}
 		}
-	}	
+	}
 }
