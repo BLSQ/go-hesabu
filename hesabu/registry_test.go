@@ -79,7 +79,7 @@ func TestGeneric(t *testing.T) {
 			}
 			result, err := functionToCall(table.args...)
 			if err != nil {
-				t.Errorf("errored")
+				t.Errorf("errored %v", err)
 			}
 			if result != table.expected {
 				t.Errorf("%s(%v) was incorrect, got: %v, want: %v.", variant, table.args, result, table.expected)
@@ -156,5 +156,44 @@ func TestAccessOutOfRangeError(t *testing.T) {
 	if err, ok := err.(*customFunctionError); !ok {
 		t.Logf("else, %v", err)
 		t.Fail()
+	}
+}
+
+func TestInvalidFloatInputs(t *testing.T) {
+	tables := []struct {
+		functionToCall string
+		args           []interface{}
+	}{
+		{"max", []interface{}{"amax", 1.0}},
+		{"min", []interface{}{"amin", 1.0}},
+		{"score_table", []interface{}{"ascore", 0.0, 2.0, 50.0, 2.0, 10.0, 95.0}},
+		{"safe_div", []interface{}{"asafe", 0.0}},
+		{"avg", []interface{}{1.0, "aavg", 3.0}},
+		{"sum", []interface{}{"asum"}},
+		{"stdevp", []interface{}{1.0, "astdevp"}},
+		{"round", []interface{}{"around"}},
+		{"floor", []interface{}{"afloor"}},
+		{"ceiling", []interface{}{"aceiling"}},
+		{"trunc", []interface{}{"atrunc"}},
+		{"round", []interface{}{"around", 5.0}},
+		{"abs", []interface{}{"aabs"}},
+		{"sqrt", []interface{}{"asqrt"}},
+		{"randbetween", []interface{}{"arandbetween", "a"}},
+	}
+	for _, table := range tables {
+		variants := []string{table.functionToCall, strings.ToUpper(table.functionToCall)}
+		for _, variant := range variants {
+			functionToCall, ok := Functions()[variant]
+			if !ok {
+				t.Errorf("Function %v was not found in functions table", variant)
+				t.Fail()
+				continue
+			}
+			_, err := functionToCall(table.args...)
+			if _, ok := err.(*customFunctionError); !ok {
+				t.Logf("Raised an error with inputs %v", table.args)
+				t.Fail()
+			}
+		}
 	}
 }

@@ -18,53 +18,55 @@ func (e *customFunctionError) Error() string {
 	return fmt.Sprintf("Error for %s-function, %s", e.functionName, e.err)
 }
 
+type inputsTypeCheck func(value interface{}) bool
+
 // Cache for evalArray-evaluations
 var evalExps = make(map[string]*govaluate.EvaluableExpression)
 
 // Functions used by `evalArray`
 var functions = map[string]govaluate.ExpressionFunction{
-	"ABS":         absFunction,
-	"abs":         absFunction,
-	"sqrt":        sqrtFunction,
-	"SQRT":        sqrtFunction,
+	"ABS":         typeCheck(isFloat64, absFunction),
+	"abs":         typeCheck(isFloat64, absFunction),
+	"sqrt":        typeCheck(isFloat64, sqrtFunction),
+	"SQRT":        typeCheck(isFloat64, sqrtFunction),
 	"ACCESS":      accessFunction,
 	"access":      accessFunction,
 	"ARRAY":       arrayFunction,
 	"array":       arrayFunction,
-	"AVG":         averageFunction,
-	"avg":         averageFunction,
-	"stdevp":      stdevFunction,
-	"STDEVP":      stdevFunction,
+	"AVG":         typeCheck(isFloat64, averageFunction),
+	"avg":         typeCheck(isFloat64, averageFunction),
+	"stdevp":      typeCheck(isFloat64, stdevFunction),
+	"STDEVP":      typeCheck(isFloat64, stdevFunction),
 	"IF":          ifFunction,
 	"If":          ifFunction,
 	"if":          ifFunction,
-	"MAX":         maxFunction,
-	"Max":         maxFunction,
-	"max":         maxFunction,
-	"MIN":         minFunction,
-	"Min":         minFunction,
-	"min":         minFunction,
-	"RANDBETWEEN": randbetweenFunction,
-	"randbetween": randbetweenFunction,
-	"ROUND":       roundFunction,
-	"round":       roundFunction,
-	"FLOOR":       floorFunction,
-	"floor":       floorFunction,
-	"CEILING":     ceilingFunction,
-	"ceiling":     ceilingFunction,
-	"trunc":       truncFunction,
-	"TRUNC":       truncFunction,
-	"SAFE_DIV":    safeDivFuntion,
-	"Safe_div":    safeDivFuntion,
-	"safe_div":    safeDivFuntion,
-	"SCORE_TABLE": scoreTableFunction,
-	"score_Table": scoreTableFunction,
-	"score_table": scoreTableFunction,
+	"MAX":         typeCheck(isFloat64, maxFunction),
+	"Max":         typeCheck(isFloat64, maxFunction),
+	"max":         typeCheck(isFloat64, maxFunction),
+	"MIN":         typeCheck(isFloat64, minFunction),
+	"Min":         typeCheck(isFloat64, minFunction),
+	"min":         typeCheck(isFloat64, minFunction),
+	"RANDBETWEEN": typeCheck(isFloat64, randbetweenFunction),
+	"randbetween": typeCheck(isFloat64, randbetweenFunction),
+	"ROUND":       typeCheck(isFloat64, roundFunction),
+	"round":       typeCheck(isFloat64, roundFunction),
+	"FLOOR":       typeCheck(isFloat64, floorFunction),
+	"floor":       typeCheck(isFloat64, floorFunction),
+	"CEILING":     typeCheck(isFloat64, ceilingFunction),
+	"ceiling":     typeCheck(isFloat64, ceilingFunction),
+	"trunc":       typeCheck(isFloat64, truncFunction),
+	"TRUNC":       typeCheck(isFloat64, truncFunction),
+	"SAFE_DIV":    typeCheck(isFloat64, safeDivFuntion),
+	"Safe_div":    typeCheck(isFloat64, safeDivFuntion),
+	"safe_div":    typeCheck(isFloat64, safeDivFuntion),
+	"SCORE_TABLE": typeCheck(isFloat64, scoreTableFunction),
+	"score_Table": typeCheck(isFloat64, scoreTableFunction),
+	"score_table": typeCheck(isFloat64, scoreTableFunction),
 	"strlen":      strlen,
 	"STRLEN":      strlen,
-	"SUM":         sumFunction,
-	"Sum":         sumFunction,
-	"sum":         sumFunction,
+	"SUM":         typeCheck(isFloat64, sumFunction),
+	"Sum":         typeCheck(isFloat64, sumFunction),
+	"sum":         typeCheck(isFloat64, sumFunction),
 }
 
 func randbetweenFunction(args ...interface{}) (interface{}, error) {
@@ -225,7 +227,8 @@ func safeDivFuntion(args ...interface{}) (interface{}, error) {
 }
 
 func maxFunction(args ...interface{}) (interface{}, error) {
-	max := args[0].(float64)
+	max, _ := args[0].(float64)
+
 	for _, arg := range args {
 		if arg.(float64) > max {
 			max = arg.(float64)
@@ -349,6 +352,29 @@ func averageFunction(args ...interface{}) (interface{}, error) {
 func strlen(args ...interface{}) (interface{}, error) {
 	length := len(args[0].(string))
 	return (float64)(length), nil
+}
+
+func isFloat64(value interface{}) bool {
+	switch value.(type) {
+	case float64:
+		return true
+	}
+	return false
+}
+
+func typeCheck(check inputsTypeCheck, f func(args ...interface{}) (interface{}, error)) func(args ...interface{}) (interface{}, error) {
+	return func(args ...interface{}) (interface{}, error) {
+		for _, a := range args {
+			if check(a) {
+			} else {
+				return nil, &customFunctionError{
+					functionName: "sumFunction",
+					err:          fmt.Sprintf("Unsupported type to sum: expected '%v'", a),
+				}
+			}
+		}
+		return f(args...)
+	}
 }
 
 // Ensures that the interface passed is a slice, it's like Array.wrap
