@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"time"
 
 	"github.com/Knetic/govaluate"
 	"github.com/gleicon/go-descriptive-statistics"
@@ -23,48 +24,50 @@ var evalExps = make(map[string]*govaluate.EvaluableExpression)
 
 // Functions used by `evalArray`
 var functions = map[string]govaluate.ExpressionFunction{
-	"ABS":         absFunction,
-	"abs":         absFunction,
-	"sqrt":        sqrtFunction,
-	"SQRT":        sqrtFunction,
-	"ACCESS":      accessFunction,
-	"access":      accessFunction,
-	"ARRAY":       arrayFunction,
-	"array":       arrayFunction,
-	"AVG":         averageFunction,
-	"avg":         averageFunction,
-	"stdevp":      stdevFunction,
-	"STDEVP":      stdevFunction,
-	"IF":          ifFunction,
-	"If":          ifFunction,
-	"if":          ifFunction,
-	"MAX":         maxFunction,
-	"Max":         maxFunction,
-	"max":         maxFunction,
-	"MIN":         minFunction,
-	"Min":         minFunction,
-	"min":         minFunction,
-	"RANDBETWEEN": randbetweenFunction,
-	"randbetween": randbetweenFunction,
-	"ROUND":       roundFunction,
-	"round":       roundFunction,
-	"FLOOR":       floorFunction,
-	"floor":       floorFunction,
-	"CEILING":     ceilingFunction,
-	"ceiling":     ceilingFunction,
-	"trunc":       truncFunction,
-	"TRUNC":       truncFunction,
-	"SAFE_DIV":    safeDivFuntion,
-	"Safe_div":    safeDivFuntion,
-	"safe_div":    safeDivFuntion,
-	"SCORE_TABLE": scoreTableFunction,
-	"score_Table": scoreTableFunction,
-	"score_table": scoreTableFunction,
-	"strlen":      strlen,
-	"STRLEN":      strlen,
-	"SUM":         sumFunction,
-	"Sum":         sumFunction,
-	"sum":         sumFunction,
+	"ABS":               absFunction,
+	"abs":               absFunction,
+	"sqrt":              sqrtFunction,
+	"SQRT":              sqrtFunction,
+	"ACCESS":            accessFunction,
+	"access":            accessFunction,
+	"ARRAY":             arrayFunction,
+	"array":             arrayFunction,
+	"AVG":               averageFunction,
+	"avg":               averageFunction,
+	"stdevp":            stdevFunction,
+	"STDEVP":            stdevFunction,
+	"IF":                ifFunction,
+	"If":                ifFunction,
+	"if":                ifFunction,
+	"MAX":               maxFunction,
+	"Max":               maxFunction,
+	"max":               maxFunction,
+	"MIN":               minFunction,
+	"Min":               minFunction,
+	"min":               minFunction,
+	"RANDBETWEEN":       randbetweenFunction,
+	"randbetween":       randbetweenFunction,
+	"ROUND":             roundFunction,
+	"round":             roundFunction,
+	"FLOOR":             floorFunction,
+	"floor":             floorFunction,
+	"CEILING":           ceilingFunction,
+	"ceiling":           ceilingFunction,
+	"trunc":             truncFunction,
+	"TRUNC":             truncFunction,
+	"SAFE_DIV":          safeDivFuntion,
+	"Safe_div":          safeDivFuntion,
+	"safe_div":          safeDivFuntion,
+	"SCORE_TABLE":       scoreTableFunction,
+	"score_Table":       scoreTableFunction,
+	"score_table":       scoreTableFunction,
+	"strlen":            strlen,
+	"STRLEN":            strlen,
+	"SUM":               sumFunction,
+	"Sum":               sumFunction,
+	"sum":               sumFunction,
+	"CAL_DAYS_IN_MONTH": calDaysInMonth,
+	"cal_days_in_month": calDaysInMonth,
 }
 
 func randbetweenFunction(args ...interface{}) (interface{}, error) {
@@ -349,6 +352,50 @@ func averageFunction(args ...interface{}) (interface{}, error) {
 func strlen(args ...interface{}) (interface{}, error) {
 	length := len(args[0].(string))
 	return (float64)(length), nil
+}
+
+func calDaysInMonth(args ...interface{}) (interface{}, error) {
+	year, err := asInt(args[0], "CAL_DAYS_IN_MONTH()")
+	if err != nil {
+		return nil, err
+	}
+	if year < 1900 {
+		return nil, &customFunctionError{
+			functionName: "CAL_DAYS_IN_MONTH()",
+			err:          fmt.Sprintf("Doesn't look like a valid year: %v %v", year, args),
+		}
+	}
+
+	monthOfYear, err := asInt(args[1], "CAL_DAYS_IN_MONTH()")
+	if err != nil {
+		return nil, err
+	}
+
+	if monthOfYear <= 0 || monthOfYear > 12 {
+		return nil, &customFunctionError{
+			functionName: "CAL_DAYS_IN_MONTH()",
+			err:          fmt.Sprintf("Doesn't look like a valid monthOfYear: %v %v", monthOfYear, args),
+		}
+	}
+	lastDayMonth := asDate(year, monthOfYear+1, 0) // 0 as day => means day before
+	return float64(lastDayMonth.Day()), nil
+}
+
+func asInt(arg interface{}, functionName string) (int, error) {
+	switch t := arg.(type) {
+	case float64:
+		return int(t), nil
+	case int:
+		return t, nil
+	}
+	return 0, &customFunctionError{
+		functionName: functionName,
+		err:          fmt.Sprintf("Not a int or float64: %v", arg),
+	}
+}
+
+func asDate(year, month, day int) time.Time {
+	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 }
 
 // Ensures that the interface passed is a slice, it's like Array.wrap

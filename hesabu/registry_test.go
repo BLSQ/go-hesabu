@@ -66,6 +66,10 @@ func TestGeneric(t *testing.T) {
 		{"access", []interface{}{1.0, 2.0, 3.0, 2.0}, 3.0},
 
 		{"strlen", []interface{}{"1234567"}, 7.0},
+
+		{"cal_days_in_month", []interface{}{2020.0, 2.0}, 29.0},
+		{"cal_days_in_month", []interface{}{2020, 2}, 29.0},
+		{"cal_days_in_month", []interface{}{2020, 12}, 31.0},
 	}
 
 	for _, table := range tables {
@@ -153,6 +157,33 @@ func TestBothUpperCaseAndLowerCaseVariantsAreFound(t *testing.T) {
 func TestAccessOutOfRangeError(t *testing.T) {
 	inputData := []interface{}{1.0, 2.0, 8.0}
 	_, err := Functions()["access"](inputData...)
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
+		t.Fail()
+	}
+}
+
+func TestCalDaysInMonthInvalidYear(t *testing.T) {
+	inputData := []interface{}{1.0, 2.0}
+	_, err := Functions()["cal_days_in_month"](inputData...)
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
+		t.Fail()
+	}
+}
+
+func TestCalDaysInMonthInvalidMonthLower(t *testing.T) {
+	inputData := []interface{}{2020.0, 0}
+	_, err := Functions()["cal_days_in_month"](inputData...)
+	if err, ok := err.(*customFunctionError); !ok {
+		t.Logf("else, %v", err)
+		t.Fail()
+	}
+}
+
+func TestCalDaysInMonthInvalidMonthGreater(t *testing.T) {
+	inputData := []interface{}{2020.0, 13}
+	_, err := Functions()["cal_days_in_month"](inputData...)
 	if err, ok := err.(*customFunctionError); !ok {
 		t.Logf("else, %v", err)
 		t.Fail()
