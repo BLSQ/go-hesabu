@@ -17,4 +17,4 @@ jobs:
         go-version: 1.11
     - name: script/cibuild
       run: |
-        script/cibuild
+        /bin/bash script/cibuild
