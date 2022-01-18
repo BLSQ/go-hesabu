@@ -12,3 +12,5 @@ GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o "${bindir}/hesabucli" hesab
 
 echo " -> New mac build at: ./bin/hesabucli-mac"
 echo " -> New build at: ./bin/hesabucli"
+
+./bin/hesabucli test/array.json
