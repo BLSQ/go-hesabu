@@ -29,7 +29,7 @@ done
 
 for name in $(ls -1 test/*.json | grep -v 'bad_')
 do
-    if $cli $name >/dev/null 2>&1
+    if cat $name > $cli  >/dev/null 2>&1
     then
         echo "${name} \033[1;32mPASS\033[0m"
     else
