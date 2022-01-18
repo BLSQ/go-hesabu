@@ -118,10 +118,6 @@ func logSolution(solutions map[string]interface{}) {
 }
 
 func getInput(flag_arguments []string) ([]byte, error) {
-	fi, err := os.Stdin.Stat()
-	if err != nil {
-		return nil, err
-	}
 	var str []byte
 	if len(flag_arguments) > 0 {
 		if len(flag_arguments) < 1 {
