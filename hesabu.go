@@ -123,12 +123,12 @@ func getInput(flag_arguments []string) ([]byte, error) {
 		return nil, err
 	}
 	var str []byte
-	fmt.Println("input mode %s",fi.Mode())
+	fmt.Println("input mode %s", fi.Mode())
 	if fi.Mode()&os.ModeNamedPipe == 0 {
 		if len(flag_arguments) < 1 {
 			return nil, errors.New("No filename supplied")
 		}
-		fmt.Println("input mode %s",flag_arguments[0])
+		fmt.Println("input mode %s", flag_arguments[0])
 		raw, err := ioutil.ReadFile(flag_arguments[0])
 		if err != nil {
 			return nil, err
