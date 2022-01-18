@@ -18,7 +18,9 @@ fi
 
 for name in test/bad_*.json
 do
-    if $cli $name
+    cat $name
+    echo "That bad ? "
+    if $cli -d $name
     then
         its_all_good=1
         echo "${name} \033[1;31mFAIL\033[0m"
@@ -30,6 +32,7 @@ done
 for name in $(ls -1 test/*.json | grep -v 'bad_')
 do
     cat $name
+    echo "That good ? "
     if $cli -d $name
     then
         echo "${name} \033[1;32mPASS\033[0m"
