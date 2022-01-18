@@ -1,7 +1,9 @@
 #! /bin/sh
 #
 #
-set -e
+set -ex
+
+ls test -alrt
 
 # Loop over all json files in the test folder, feed them through the
 # binary and check if hesabu exits the right way:
