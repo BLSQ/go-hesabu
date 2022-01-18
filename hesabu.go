@@ -129,7 +129,6 @@ func getInput(flag_arguments []string) ([]byte, error) {
 		}
 		str = raw
 	} else {
-		fmt.Println("reading from STDIN")
 		raw, err := ioutil.ReadAll(os.Stdin)
 		if err != nil {
 			return nil, err
