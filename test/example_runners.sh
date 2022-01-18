@@ -29,6 +29,7 @@ done
 
 for name in $(ls -1 test/*.json | grep -v 'bad_')
 do
+    cat $name
     if $cli -d $name
     then
         echo "${name} \033[1;32mPASS\033[0m"
