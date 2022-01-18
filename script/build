@@ -14,3 +14,4 @@ echo " -> New mac build at: ./bin/hesabucli-mac"
 echo " -> New build at: ./bin/hesabucli"
 
 ./bin/hesabucli test/array.json
+echo '{"a": "1 + 2 + b", "b": "7"}' | ./bin/hesabucli
