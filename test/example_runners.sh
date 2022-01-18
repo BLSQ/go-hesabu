@@ -34,7 +34,7 @@ do
         echo "${name} \033[1;32mPASS\033[0m"
     else
         its_all_good=1
-        echo "${name}"
+        echo "${cli) ${name}"
         cat $name
         $cli $name
         echo "${name} \033[1;31mFAIL\033[0m"
