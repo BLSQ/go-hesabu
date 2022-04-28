@@ -96,14 +96,14 @@ You need to either supply a filename or pipe to hesabu
 }
 
 func logErrors(errors []hesabu.EvalError) {
-	var content = make(map[string]interface{}, 1)
+	var content = make(map[string]any, 1)
 	content["errors"] = errors
 	b, _ := json.MarshalIndent(content, "", "  ")
 	s := string(b)
 	fmt.Println(s)
 }
 
-func logSolution(solutions map[string]interface{}) {
+func logSolution(solutions map[string]any) {
 	b, err := json.MarshalIndent(solutions, "", "  ")
 	if err != nil {
 		logErrors([]hesabu.EvalError{
