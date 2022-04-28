@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/Knetic/govaluate"
-	toposort "github.com/otaviokr/topological-sort"
+	"github.com/otaviokr/topological-sort/toposort"
 )
 
 // ParsedEquations raw equation, EvaluableExpression and dependencies
@@ -61,7 +61,12 @@ func Parse(rawEquations map[string]string, functions map[string]govaluate.Expres
 
 // Solve the equation in correct order and return map of values
 func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
-	topsort := toposort.ReversedSort(parsedEquations.Dependencies)
+	topsort, err := toposort.ReverseTarjan(parsedEquations.Dependencies)
+	if err != nil {
+		panic(err)
+		evalError := EvalError{Message: "cycle between equations", Source: "general", Expression: "general"}
+		return nil, &CustomError{EvalError: evalError}
+	}
 
 	solutions := make(map[string]interface{}, len(parsedEquations.RawEquations))
 	if len(topsort) == 0 {
