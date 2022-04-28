@@ -60,10 +60,10 @@ func Parse(rawEquations map[string]string, functions map[string]govaluate.Expres
 }
 
 // Solve the equation in correct order and return map of values
-func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
+func (parsedEquations ParsedEquations) Solve() (map[string]any, error) {
 	topsort := toposort.ReversedSort(parsedEquations.Dependencies)
 
-	solutions := make(map[string]interface{}, len(parsedEquations.RawEquations))
+	solutions := make(map[string]any, len(parsedEquations.RawEquations))
 	if len(topsort) == 0 {
 		evalError := EvalError{Message: "cycle between equations", Source: "general", Expression: "general"}
 		return nil, &CustomError{EvalError: evalError}
@@ -99,7 +99,7 @@ func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 	return solutions, nil
 }
 
-func (parsedEquations ParsedEquations) newSingleError(key string, message string) (map[string]interface{}, error) {
+func (parsedEquations ParsedEquations) newSingleError(key string, message string) (map[string]any, error) {
 	equation := parsedEquations.RawEquations[key]
 	evalError := EvalError{Message: message, Source: key, Expression: equation}
 	return nil, &CustomError{EvalError: evalError}

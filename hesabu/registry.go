@@ -70,7 +70,7 @@ var functions = map[string]govaluate.ExpressionFunction{
 	"cal_days_in_month": calDaysInMonth,
 }
 
-func randbetweenFunction(args ...interface{}) (interface{}, error) {
+func randbetweenFunction(args ...any) (any, error) {
 	min := args[0].(float64)
 	max := args[1].(float64)
 	result := min + rand.Float64()*(max-min)
@@ -86,7 +86,7 @@ func randbetweenFunction(args ...interface{}) (interface{}, error) {
 	matching_rules.last
   end
 */
-func scoreTableFunction(args ...interface{}) (interface{}, error) {
+func scoreTableFunction(args ...any) (any, error) {
 	target := args[0].(float64)
 	rules := args[1:]
 	chunkSize := 3
@@ -121,7 +121,7 @@ func scoreTableFunction(args ...interface{}) (interface{}, error) {
 // access(ARRAY(1,2,0)) => 1
 //
 // If the index is out of range an error will be returned.
-func accessFunction(args ...interface{}) (interface{}, error) {
+func accessFunction(args ...any) (any, error) {
 	index := int(args[len(args)-1].(float64))
 	if index > len(args)-1 {
 		return nil, &customFunctionError{
@@ -133,14 +133,14 @@ func accessFunction(args ...interface{}) (interface{}, error) {
 	return args[index], nil
 }
 
-func getShiftPlaces(args []interface{}) float64 {
+func getShiftPlaces(args []any) float64 {
 	places := int(getSecondArgsAsFloat(args, 0.0))
 
 	shift := math.Pow(10, float64(places))
 	return shift
 }
 
-func getSecondArgsAsFloat(args []interface{}, defaultValue float64) float64 {
+func getSecondArgsAsFloat(args []any, defaultValue float64) float64 {
 	value := defaultValue
 	if len(args) == 2 {
 		value = args[1].(float64)
@@ -148,7 +148,7 @@ func getSecondArgsAsFloat(args []interface{}, defaultValue float64) float64 {
 	return value
 }
 
-func roundFunction(args ...interface{}) (interface{}, error) {
+func roundFunction(args ...any) (any, error) {
 	shift := getShiftPlaces(args)
 	f := args[0].(float64)
 	return (math.Round(f*shift) / shift), nil
@@ -157,7 +157,7 @@ func roundFunction(args ...interface{}) (interface{}, error) {
 // mimic FLOOR https://support.office.com/en-us/article/floor-function-14bb497c-24f2-4e04-b327-b0b4de5a8886
 // by default floor to nearest multiple of 1.0
 // but can be passed as an optional argument
-func floorFunction(args ...interface{}) (interface{}, error) {
+func floorFunction(args ...any) (any, error) {
 	multiple := getSecondArgsAsFloat(args, 1.0)
 	f := args[0].(float64)
 	return (math.Floor(f/multiple) * multiple), nil
@@ -166,7 +166,7 @@ func floorFunction(args ...interface{}) (interface{}, error) {
 // CEILING https://support.office.com/en-us/article/ceiling-function-0a5cd7c8-0720-4f0a-bd2c-c943e510899f
 // by default ceil to nearest multiple of 1.0
 // but can be passed as an optional argument
-func ceilingFunction(args ...interface{}) (interface{}, error) {
+func ceilingFunction(args ...any) (any, error) {
 	multiple := getSecondArgsAsFloat(args, 1.0)
 	f := args[0].(float64)
 	return (math.Ceil(f/multiple) * multiple), nil
@@ -175,17 +175,17 @@ func ceilingFunction(args ...interface{}) (interface{}, error) {
 // TRUNC https://support.office.com/en-us/article/trunc-function-8b86a64c-3127-43db-ba14-aa5ceb292721
 // by default 0 digits after the decimal
 // but can passed an optional argument to ask for more
-func truncFunction(args ...interface{}) (interface{}, error) {
+func truncFunction(args ...any) (any, error) {
 	shift := getShiftPlaces(args)
 	f := args[0].(float64)
 	return (float64(int(f*shift)) / shift), nil
 }
 
-func absFunction(args ...interface{}) (interface{}, error) {
+func absFunction(args ...any) (any, error) {
 	return math.Abs(args[0].(float64)), nil
 }
 
-func sqrtFunction(args ...interface{}) (interface{}, error) {
+func sqrtFunction(args ...any) (any, error) {
 	float, ok := args[0].(float64)
 	if !ok {
 		return nil, &customFunctionError{
@@ -202,8 +202,8 @@ func sqrtFunction(args ...interface{}) (interface{}, error) {
 	return math.Sqrt(float), nil
 }
 
-func ifFunction(args ...interface{}) (interface{}, error) {
-	var result interface{}
+func ifFunction(args ...any) (any, error) {
+	var result any
 	bool, ok := args[0].(bool)
 	if !ok {
 		return nil, &customFunctionError{
@@ -220,14 +220,14 @@ func ifFunction(args ...interface{}) (interface{}, error) {
 	return result, nil
 }
 
-func safeDivFuntion(args ...interface{}) (interface{}, error) {
+func safeDivFuntion(args ...any) (any, error) {
 	if args[1].(float64) == 0 {
 		return float64(0), nil
 	}
 	return (args[0].(float64) / args[1].(float64)), nil
 }
 
-func maxFunction(args ...interface{}) (interface{}, error) {
+func maxFunction(args ...any) (any, error) {
 	max := args[0].(float64)
 	for _, arg := range args {
 		if arg.(float64) > max {
@@ -237,7 +237,7 @@ func maxFunction(args ...interface{}) (interface{}, error) {
 	return max, nil
 }
 
-func minFunction(args ...interface{}) (interface{}, error) {
+func minFunction(args ...any) (any, error) {
 	min := args[0].(float64)
 	for _, arg := range args {
 		if arg.(float64) < min {
@@ -247,7 +247,7 @@ func minFunction(args ...interface{}) (interface{}, error) {
 	return min, nil
 }
 
-func sumFunction(args ...interface{}) (interface{}, error) {
+func sumFunction(args ...any) (any, error) {
 	total := float64(0.0)
 	for _, a := range args {
 		if v, ok := a.(float64); ok {
@@ -262,7 +262,7 @@ func sumFunction(args ...interface{}) (interface{}, error) {
 	return total, nil
 }
 
-func stdevFunction(args ...interface{}) (interface{}, error) {
+func stdevFunction(args ...any) (any, error) {
 	values := make(descriptive_statistics.Enum, len(args))
 	for i := range args {
 		values[i] = args[i].(float64)
@@ -274,7 +274,7 @@ func stdevFunction(args ...interface{}) (interface{}, error) {
 // dentaku, so arrays can be explicilty marked as arrays.
 //
 // ARRAY(1,2,3) => (1,2,3)
-func arrayFunction(args ...interface{}) (interface{}, error) {
+func arrayFunction(args ...any) (any, error) {
 	return args, nil
 }
 
@@ -291,7 +291,7 @@ func arrayFunction(args ...interface{}) (interface{}, error) {
 //
 //       (2-1, 3-2,4-3)
 //       (1,1,1)
-func evalArrayFunction(args ...interface{}) (interface{}, error) {
+func evalArrayFunction(args ...any) (any, error) {
 	key1 := args[0].(string)
 	array1 := ensureSlice(args[1])
 	key2 := args[2].(string)
@@ -322,10 +322,10 @@ func evalArrayFunction(args ...interface{}) (interface{}, error) {
 			err:          fmt.Sprintf("Meta formula: %v", err),
 		}
 	}
-	var results []interface{}
+	var results []any
 	for i, item1 := range array1 {
 		item2 := array2[i]
-		parameters := make(map[string]interface{}, 2)
+		parameters := make(map[string]any, 2)
 		parameters[key1] = item1
 		parameters[key2] = item2
 		result, error_eval := expression.Evaluate(parameters)
@@ -341,7 +341,7 @@ func evalArrayFunction(args ...interface{}) (interface{}, error) {
 	return results, nil
 }
 
-func averageFunction(args ...interface{}) (interface{}, error) {
+func averageFunction(args ...any) (any, error) {
 	total := float64(0)
 	for _, x := range args {
 		total += x.(float64)
@@ -349,12 +349,12 @@ func averageFunction(args ...interface{}) (interface{}, error) {
 	return (total / float64(len(args))), nil
 }
 
-func strlen(args ...interface{}) (interface{}, error) {
+func strlen(args ...any) (any, error) {
 	length := len(args[0].(string))
 	return (float64)(length), nil
 }
 
-func calDaysInMonth(args ...interface{}) (interface{}, error) {
+func calDaysInMonth(args ...any) (any, error) {
 	year, err := asInt(args[0], "CAL_DAYS_IN_MONTH()")
 	if err != nil {
 		return nil, err
@@ -381,7 +381,7 @@ func calDaysInMonth(args ...interface{}) (interface{}, error) {
 	return float64(lastDayMonth.Day()), nil
 }
 
-func asInt(arg interface{}, functionName string) (int, error) {
+func asInt(arg any, functionName string) (int, error) {
 	switch t := arg.(type) {
 	case float64:
 		return int(t), nil
@@ -400,10 +400,10 @@ func asDate(year, month, day int) time.Time {
 
 // Ensures that the interface passed is a slice, it's like Array.wrap
 // but in golang.
-func ensureSlice(arg interface{}) []interface{} {
-	arr, ok := arg.([]interface{})
+func ensureSlice(arg any) []any {
+	arr, ok := arg.([]any)
 	if !ok {
-		arr = make([]interface{}, 1)
+		arr = make([]any, 1)
 		arr[0] = arg
 	}
 	return arr

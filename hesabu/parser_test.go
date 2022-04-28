@@ -11,7 +11,7 @@ type ParserTest struct {
 	Input              string
 	Expected           string
 	ParserErrorMessage string
-	Solution           interface{}
+	Solution           any
 	SolutionError      string
 }
 
