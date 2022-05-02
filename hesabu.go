@@ -118,12 +118,8 @@ func logSolution(solutions map[string]interface{}) {
 }
 
 func getInput(flag_arguments []string) ([]byte, error) {
-	fi, err := os.Stdin.Stat()
-	if err != nil {
-		return nil, err
-	}
 	var str []byte
-	if fi.Mode()&os.ModeNamedPipe == 0 {
+	if len(flag_arguments) > 0 {
 		if len(flag_arguments) < 1 {
 			return nil, errors.New("No filename supplied")
 		}
