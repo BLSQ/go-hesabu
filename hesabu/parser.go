@@ -63,8 +63,7 @@ func Parse(rawEquations map[string]string, functions map[string]govaluate.Expres
 func (parsedEquations ParsedEquations) Solve() (map[string]interface{}, error) {
 	topsort, err := toposort.ReverseTarjan(parsedEquations.Dependencies)
 	if err != nil {
-		panic(err)
-		evalError := EvalError{Message: "cycle between equations", Source: "general", Expression: "general"}
+		evalError := EvalError{Message: "cycle between equations : " + err.Error(), Source: "general", Expression: "general"}
 		return nil, &CustomError{EvalError: evalError}
 	}
 
