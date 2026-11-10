@@ -5,7 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"runtime"
@@ -96,14 +96,14 @@ You need to either supply a filename or pipe to hesabu
 }
 
 func logErrors(errors []hesabu.EvalError) {
-	var content = make(map[string]interface{}, 1)
+	var content = make(map[string]any, 1)
 	content["errors"] = errors
 	b, _ := json.MarshalIndent(content, "", "  ")
 	s := string(b)
 	fmt.Println(s)
 }
 
-func logSolution(solutions map[string]interface{}) {
+func logSolution(solutions map[string]any) {
 	b, err := json.MarshalIndent(solutions, "", "  ")
 	if err != nil {
 		logErrors([]hesabu.EvalError{
@@ -123,13 +123,13 @@ func getInput(flag_arguments []string) ([]byte, error) {
 		if len(flag_arguments) < 1 {
 			return nil, errors.New("No filename supplied")
 		}
-		raw, err := ioutil.ReadFile(flag_arguments[0])
+		raw, err := os.ReadFile(flag_arguments[0])
 		if err != nil {
 			return nil, err
 		}
 		str = raw
 	} else {
-		raw, err := ioutil.ReadAll(os.Stdin)
+		raw, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			return nil, err
 		}

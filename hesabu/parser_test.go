@@ -2,7 +2,7 @@ package hesabu
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -11,7 +11,7 @@ type ParserTest struct {
 	Input              string
 	Expected           string
 	ParserErrorMessage string
-	Solution           interface{}
+	Solution           any
 	SolutionError      string
 }
 
@@ -330,7 +330,7 @@ func TestDetectsAndReportsInf(t *testing.T) {
 
 func BenchmarkParse(b *testing.B) {
 	functions := Functions()
-	raw, err := ioutil.ReadFile("../test/very_large_set_of_equations.json")
+	raw, err := os.ReadFile("../test/very_large_set_of_equations.json")
 	if err != nil {
 		panic("file not read")
 	}
@@ -347,7 +347,7 @@ func BenchmarkParse(b *testing.B) {
 
 func BenchmarkSolve(b *testing.B) {
 	functions := Functions()
-	raw, err := ioutil.ReadFile("../test/very_large_set_of_equations.json")
+	raw, err := os.ReadFile("../test/very_large_set_of_equations.json")
 	if err != nil {
 		panic("file not read")
 	}
