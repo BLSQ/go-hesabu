@@ -1,0 +1,39 @@
+name: Release
+
+# push a tag (git tag -a v0.1.0 -m "..." && git push origin v0.1.0) to publish
+# hesabucli (linux) and hesabucli-mac as a github release, see README
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # github release
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # git describe for the version
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Test
+        run: script/test
+
+      - name: Build
+        run: |
+          script/build
+          ./bin/hesabucli -v | grep -q "^${GITHUB_REF_NAME}," # binary reports the tag
+          (cd bin && sha256sum hesabucli hesabucli-mac > checksums.txt)
+
+      - name: Publish the github release
+        run: |
+          gh release create "$GITHUB_REF_NAME" bin/hesabucli bin/hesabucli-mac bin/checksums.txt \
+            --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

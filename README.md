@@ -1,7 +1,5 @@
-[![Maintainability](https://api.codeclimate.com/v1/badges/521737120ca70381247d/maintainability)](https://codeclimate.com/github/BLSQ/go-hesabu/maintainability)
+[![Go](https://github.com/BLSQ/go-hesabu/actions/workflows/go.yml/badge.svg)](https://github.com/BLSQ/go-hesabu/actions/workflows/go.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/BLSQ/go-hesabu)](https://goreportcard.com/report/github.com/BLSQ/go-hesabu)
-[![Build Status](https://travis-ci.org/BLSQ/go-hesabu.svg?branch=master)](https://travis-ci.org/BLSQ/go-hesabu)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/521737120ca70381247d/test_coverage)](https://codeclimate.com/github/BLSQ/go-hesabu/test_coverage)
 
 # go-hesabu
 go-hesabu is golang equivalent to hesabu
@@ -45,7 +43,7 @@ you will get
 
 ## Development setup
 
-require a go 1.11
+requires the go version of `go.mod` (1.27)
 
 ```
 ./script/test && go tool cover -func=coverage.out && go tool cover  -html=coverage.out -o coverage.html
@@ -94,21 +92,20 @@ Even more interesting is that you can open an interactive version in you browser
 
 ## releasing
 
-have goreleaser https://goreleaser.com/install/
-
-on ubuntu : `snap install goreleaser --classic`
-
-for github token, use scope repo and see : https://github.com/settings/tokens/new
+Push a tag, the `Release` workflow tests, builds `hesabucli` (linux, static) and
+`hesabucli-mac` with the go version of `go.mod`, and publishes them with their
+checksums as a github release:
 
 ```
-export GITHUB_TOKEN=...
-rm -rf ./dist/
-git tag -a v0.0.3 -m "First release with goreleaser"
-git push origin v0.0.3
-goreleaser release
+git tag -a v0.1.0 -m "go 1.27"
+git push origin v0.1.0
 ```
 
-check the release page https://github.com/BLSQ/go-hesabu/releases/
+check the release page https://github.com/BLSQ/go-hesabu/releases/ then update
+the binaries of the hesabu gem from it (see the hesabu README).
+
+Local build (same flags, reproducible): `script/build`, or without go installed
+`script/docker-build`.
 
 
 ## Dependencies
