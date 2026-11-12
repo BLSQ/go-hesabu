@@ -1,6 +1,6 @@
 module github.com/BLSQ/go-hesabu
 
-go 1.17
+go 1.27
 
 require (
 	github.com/Knetic/govaluate v3.0.0+incompatible
