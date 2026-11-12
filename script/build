@@ -7,8 +7,14 @@ echo " -> Building"
 
 bindir="${PWD}/bin"
 
-GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o "${bindir}/hesabucli-mac" hesabu.go
-GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o "${bindir}/hesabucli" hesabu.go
+# static (no cgo, runs on alpine/musl), reproducible (-trimpath), version from git
+version=$(git describe --tags --always --dirty 2>/dev/null || echo dev)
+commit=$(git rev-parse --short HEAD 2>/dev/null || echo none)
+date=$(git log -1 --format=%cd --date=format:%Y%m%d 2>/dev/null || echo unknown)
+ldflags="-s -w -X main.version=${version} -X main.commit=${commit} -X main.date=${date}"
+
+CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags="${ldflags}" -o "${bindir}/hesabucli-mac" hesabu.go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags="${ldflags}" -o "${bindir}/hesabucli" hesabu.go
 
 echo " -> New mac build at: ./bin/hesabucli-mac"
 echo " -> New build at: ./bin/hesabucli"

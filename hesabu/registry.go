@@ -78,13 +78,13 @@ func randbetweenFunction(args ...interface{}) (interface{}, error) {
 }
 
 /*
- SCORE_TABLE = lambda do |*args|
-	target = args.shift
-	matching_rules = args.each_slice(3).find do |lower, greater, result|
-	  greater.nil? || result.nil? ? true : lower <= target && target < greater
-	end
-	matching_rules.last
-  end
+	 SCORE_TABLE = lambda do |*args|
+		target = args.shift
+		matching_rules = args.each_slice(3).find do |lower, greater, result|
+		  greater.nil? || result.nil? ? true : lower <= target && target < greater
+		end
+		matching_rules.last
+	  end
 */
 func scoreTableFunction(args ...interface{}) (interface{}, error) {
 	target := args[0].(float64)
@@ -289,8 +289,8 @@ func arrayFunction(args ...interface{}) (interface{}, error) {
 // Will loop over the arrays and apply the formula to each index, so
 // in this example would result in:
 //
-//       (2-1, 3-2,4-3)
-//       (1,1,1)
+//	(2-1, 3-2,4-3)
+//	(1,1,1)
 func evalArrayFunction(args ...interface{}) (interface{}, error) {
 	key1 := args[0].(string)
 	array1 := ensureSlice(args[1])

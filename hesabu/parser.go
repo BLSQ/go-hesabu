@@ -116,10 +116,10 @@ func isNumeric(s string) bool {
 
 // There can still be legacy formulas that use the old AND, OR and '='
 // syntax, the clean method will replace this with:
-//       AND => &&
-//       OR => ||
-//       = => == (only for equality comparison)
 //
+//	AND => &&
+//	OR => ||
+//	= => == (only for equality comparison)
 func clean(expression string) (cleanExpression string) {
 	if !needsCleaning(expression) {
 		return expression
